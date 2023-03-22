@@ -1,4 +1,4 @@
-package grants
+package assets
 
 import (
 	"fmt"
@@ -11,32 +11,40 @@ import (
 )
 
 var (
-	_ ISnowflakeGrant = &RoleAccountGrant[i.ISnowflakeRole]{}
+	_ i.ISnowflakeGrantAsset = &GrantActionAccountGrant[i.ISnowflakePrincipal]{}
 )
 
-type RoleAccountGrant[T i.ISnowflakeRole] struct {
-	Role T
+type GrantActionAccountGrant[T i.ISnowflakePrincipal] struct {
+	Principal T
 }
 
-func (r *RoleAccountGrant[T]) GetGrantStatement(privileges []enum.Privilege) (string, int) {
+func (r *GrantActionAccountGrant[T]) GetGrantStatement(privileges []enum.Privilege) (string, int) {
 	stringPrivileges := lo.Map(privileges, func(x enum.Privilege, index int) string { return x.String() })
 	privs := strings.Join(stringPrivileges, ", ")
-	if r.Role.IsDatabaseRole() {
+	switch any(r.Principal).(type) {
+	case *Role:
+		return fmt.Sprintf("GRANT %[1]s ON ACCOUNT TO ROLE %[2]s;", privs, r.Principal.GetIdentifier()), 1
+	case *DatabaseRole:
 		panic("you can't grant account level privileges to database roles")
+	default:
+		panic("GetGrantStatement is not implemented for this interface type")
 	}
-	return fmt.Sprintf("GRANT %[1]s ON ACCOUNT TO ROLE %[2]s;", privs, r.Role.GetIdentifier()), 1
 }
 
-func (r *RoleAccountGrant[T]) GetRevokeStatement(privileges []enum.Privilege) (string, int) {
+func (r *GrantActionAccountGrant[T]) GetRevokeStatement(privileges []enum.Privilege) (string, int) {
 	stringPrivileges := lo.Map(privileges, func(x enum.Privilege, index int) string { return x.String() })
 	privs := strings.Join(stringPrivileges, ", ")
-	if r.Role.IsDatabaseRole() {
-		panic("you can't neither grant nor revoke account level privileges to/from database roles")
+	switch any(r.Principal).(type) {
+	case *Role:
+		return fmt.Sprintf("REVOKE %[1]s ON ACCOUNT FROM ROLE %[2]s CASCADE;", privs, r.Principal.GetIdentifier()), 1
+	case *DatabaseRole:
+		panic("Account privileges cannot be neither granted to nor revoked from database roles")
+	default:
+		panic("GetRevokeStatement is not implemented for this interface type")
 	}
-	return fmt.Sprintf("REVOKE %[1]s ON ACCOUNT FROM ROLE %[2]s CASCADE;", privs, r.Role.GetIdentifier()), 1
 }
 
-func (*RoleAccountGrant[T]) validatePrivileges(privileges []enum.Privilege) bool {
+func (*GrantActionAccountGrant[T]) ValidatePrivileges(privileges []enum.Privilege) bool {
 	allowedPrivileges := []enum.Privilege{
 		enum.PrivilegeCreateAccount,
 		enum.PrivilegeCreateDataExchangeListing,

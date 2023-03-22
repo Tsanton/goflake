@@ -1,24 +1,23 @@
 package assets
 
 import (
-	gra "github.com/tsanton/goflake-client/goflake/models/assets/grants"
 	i "github.com/tsanton/goflake-client/goflake/models/assets/interface"
 	enum "github.com/tsanton/goflake-client/goflake/models/enums"
 )
 
 var (
-	_ i.ISnowflakeAsset = &Grant{}
+	_ i.ISnowflakeAsset = &GrantAction{}
 )
 
-type Grant struct {
-	Target     gra.ISnowflakeGrant
+type GrantAction struct {
+	Target     i.ISnowflakeGrantAsset
 	Privileges []enum.Privilege
 }
 
-func (r *Grant) GetCreateStatement() (string, int) {
+func (r *GrantAction) GetCreateStatement() (string, int) {
 	return r.Target.GetGrantStatement(r.Privileges)
 }
 
-func (r *Grant) GetDeleteStatement() (string, int) {
+func (r *GrantAction) GetDeleteStatement() (string, int) {
 	return r.Target.GetRevokeStatement(r.Privileges)
 }

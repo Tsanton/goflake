@@ -9,7 +9,6 @@ import (
 	g "github.com/tsanton/goflake-client/goflake"
 	i "github.com/tsanton/goflake-client/goflake/integration"
 	a "github.com/tsanton/goflake-client/goflake/models/assets"
-	ag "github.com/tsanton/goflake-client/goflake/models/assets/grants"
 	ai "github.com/tsanton/goflake-client/goflake/models/assets/interface"
 	dg "github.com/tsanton/goflake-client/goflake/models/describables/grants"
 	eg "github.com/tsanton/goflake-client/goflake/models/entities/grants"
@@ -29,8 +28,8 @@ func Test_grant_role_account_privilege(t *testing.T) {
 		Comment: "integration test goflake",
 		Owner:   "USERADMIN",
 	}
-	privilege := a.Grant{
-		Target:     &ag.RoleAccountGrant[*a.Role]{Role: &role},
+	privilege := a.GrantAction{
+		Target:     &a.GrantActionAccountGrant[*a.Role]{Principal: &role},
 		Privileges: []enums.Privilege{enums.PrivilegeCreateAccount},
 	}
 
@@ -64,8 +63,8 @@ func Test_grant_role_account_privileges(t *testing.T) {
 		Comment: "integration test goflake",
 		Owner:   "USERADMIN",
 	}
-	privilege := a.Grant{
-		Target:     &ag.RoleAccountGrant[*a.Role]{Role: &role},
+	privilege := a.GrantAction{
+		Target:     &a.GrantActionAccountGrant[*a.Role]{Principal: &role},
 		Privileges: []enums.Privilege{enums.PrivilegeCreateAccount, enums.PrivilegeCreateUser},
 	}
 
