@@ -4,12 +4,13 @@ import (
 	"testing"
 
 	a "github.com/tsanton/goflake-client/goflake/models/assets"
+	i "github.com/tsanton/goflake-client/goflake/models/assets/interface"
 	u "github.com/tsanton/goflake-client/goflake/utilities"
 )
 
 func Test_stack_is_empty(t *testing.T) {
 	/* Arrange */
-	s := u.Stack[a.ISnowflakeAsset]{}
+	s := u.Stack[i.ISnowflakeAsset]{}
 
 	/* Act and Assert */
 	if !s.IsEmpty() {
@@ -19,7 +20,7 @@ func Test_stack_is_empty(t *testing.T) {
 
 func Test_stack_put(t *testing.T) {
 	/* Arrange */
-	s := u.Stack[a.ISnowflakeAsset]{}
+	s := u.Stack[i.ISnowflakeAsset]{}
 
 	/* Act */
 	r := a.RoleRelationship{ChildRoleName: "CHILD", ParentRoleName: "PARENT"}
@@ -33,7 +34,7 @@ func Test_stack_put(t *testing.T) {
 
 func Test_stack_order(t *testing.T) {
 	/* Arrange */
-	s := u.Stack[a.ISnowflakeAsset]{}
+	s := u.Stack[i.ISnowflakeAsset]{}
 	r1 := a.RoleRelationship{ChildRoleName: "A", ParentRoleName: "B"}
 	r2 := a.RoleRelationship{ChildRoleName: "C", ParentRoleName: "D"}
 	r3 := a.RoleRelationship{ChildRoleName: "E", ParentRoleName: "F"}

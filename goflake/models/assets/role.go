@@ -7,8 +7,8 @@ import (
 )
 
 var (
-	_ i.ISnowflakeAsset = &Role{}
-	_ i.ISnowflakeRole  = &Role{}
+	_ i.ISnowflakeAsset     = &Role{}
+	_ i.ISnowflakePrincipal = &Role{}
 )
 
 type Role struct {
@@ -32,9 +32,4 @@ func (r *Role) GetDeleteStatement() (string, int) {
 
 func (r *Role) GetIdentifier() string {
 	return r.Name
-}
-
-// IsDatabaseRole implements ISnowflakeRole
-func (*Role) IsDatabaseRole() bool {
-	return false
 }

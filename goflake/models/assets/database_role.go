@@ -7,25 +7,20 @@ import (
 )
 
 var (
-	_ i.ISnowflakeAsset = &DatabaseRole{}
-	_ i.ISnowflakeRole  = &DatabaseRole{}
+	_ i.ISnowflakeAsset     = &DatabaseRole{}
+	_ i.ISnowflakePrincipal = &DatabaseRole{}
 )
 
 type DatabaseRole struct {
 	Name         string
 	DatabaseName string
-	Owner        string
+	Owner        i.ISnowflakePrincipal
 	Comment      string
 }
 
 // GetIdentifier implements ISnowflakeRole
 func (r *DatabaseRole) GetIdentifier() string {
 	return fmt.Sprintf("%[1]s.%[2]s", r.DatabaseName, r.Name)
-}
-
-// IsDatabaseRole implements ISnowflakeRole
-func (r *DatabaseRole) IsDatabaseRole() bool {
-	return true
 }
 
 func (r *DatabaseRole) GetCreateStatement() (string, int) {

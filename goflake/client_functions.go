@@ -28,8 +28,11 @@ func ExecuteScalar[T executeScalarConstraint](g *GoflakeClient, query string) (T
 }
 
 func RegisterAsset(g *GoflakeClient, asset ai.ISnowflakeAsset, stack *u.Stack[ai.ISnowflakeAsset]) error {
-	stack.Put(asset)
-	return CreateAsset(g, asset)
+	err := CreateAsset(g, asset)
+	if err == nil {
+		stack.Put(asset)
+	}
+	return err
 }
 
 func CreateAsset(g *GoflakeClient, asset ai.ISnowflakeAsset) error {

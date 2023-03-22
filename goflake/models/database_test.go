@@ -23,7 +23,7 @@ func Test_create_database(t *testing.T) {
 	db := a.Database{
 		Name:    "IGT_DEMO",
 		Comment: "integration test goflake",
-		Owner:   "SYSADMIN",
+		Owner:   &a.Role{Name: "SYSADMIN"},
 	}
 
 	/* Act */
@@ -40,14 +40,17 @@ func Test_describe_database(t *testing.T) {
 	db := a.Database{
 		Name:    "IGT_DEMO",
 		Comment: "integration test goflake",
-		Owner:   "SYSADMIN",
+		Owner:   &a.Role{Name: "SYSADMIN"},
 	}
 	i.ErrorFailNow(t, g.RegisterAsset(cli, &db, &stack))
 
 	/* Act */
 	ddb, err := g.Describe[e.Database](cli, &d.Database{Name: db.Name})
-	i.ErrorFailNow(t, err)
 
 	/* Assert */
+	assert.Nil(t, err)
 	assert.Equal(t, ddb.Name, db.Name)
 }
+
+// TODO: implement
+func Test_describe_non_existing_database(t *testing.T) {}

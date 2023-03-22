@@ -13,15 +13,23 @@ var (
 type Database struct {
 	Name    string
 	Comment string
-	Owner   string
+	Owner   i.ISnowflakePrincipal
 }
 
 func (r *Database) GetCreateStatement() (string, int) {
+	var principalType string
+	switch r.Owner.(type) {
+	case *Role:
+		principalType = "ROLE"
+	case *DatabaseRole:
+		principalType = "DATABASE ROLE"
+	default:
+		panic("Ownership for this principal type is not implemented")
+	}
 	return fmt.Sprintf(`
 CREATE OR REPLACE DATABASE %[1]s COMMENT = '%[2]s';
-GRANT OWNERSHIP ON DATABASE %[1]s TO %[3]s;
-`,
-		r.Name, r.Comment, r.Owner,
+GRANT OWNERSHIP ON DATABASE %[1]s TO %[3]s %[4]s;`,
+		r.Name, r.Comment, principalType, r.Owner.GetIdentifier(),
 	), 2
 }
 
