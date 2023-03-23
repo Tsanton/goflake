@@ -19,3 +19,10 @@ func (r *DatabaseRole) GetDescribeStatement() string {
 func (r *DatabaseRole) IsProcedure() bool {
 	return false
 }
+
+func (r *DatabaseRole) GetPrincipalType() string {
+	return "DATABASE ROLE"
+}
+func (r *DatabaseRole) GetPrincipalIdentifier() string {
+	return fmt.Sprintf("%[1]s.%[2]s", r.DatabaseName, r.Name)
+}

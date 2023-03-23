@@ -45,7 +45,7 @@ func Test_describe_database(t *testing.T) {
 	i.ErrorFailNow(t, g.RegisterAsset(cli, &db, &stack))
 
 	/* Act */
-	ddb, err := g.Describe[e.Database](cli, &d.Database{Name: db.Name})
+	ddb, err := g.DescribeOne[e.Database](cli, &d.Database{Name: db.Name})
 
 	/* Assert */
 	assert.Nil(t, err)

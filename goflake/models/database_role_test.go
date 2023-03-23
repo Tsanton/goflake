@@ -62,7 +62,7 @@ func Test_describe_database_role(t *testing.T) {
 	i.ErrorFailNow(t, g.RegisterAsset(cli, &role, &stack))
 
 	/* Act */
-	dr, err := g.Describe[e.Role](cli, &d.DatabaseRole{Name: role.Name, DatabaseName: db.Name})
+	dr, err := g.DescribeOne[e.Role](cli, &d.DatabaseRole{Name: role.Name, DatabaseName: db.Name})
 	i.ErrorFailNow(t, err)
 
 	/* Assert */

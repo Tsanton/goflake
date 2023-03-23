@@ -1,4 +1,4 @@
-package grants
+package assets
 
 import (
 	"fmt"
@@ -10,36 +10,45 @@ import (
 )
 
 var (
-	_ ISnowflakeGrant = &RoleFutureSchemaGrant[i.ISnowflakeRole]{}
+	_ i.ISnowflakeGrantAsset = &GrantActionFutureSchemaGrant[i.ISnowflakePrincipal]{}
 )
 
-type RoleFutureSchemaGrant[T i.ISnowflakeRole] struct {
-	Role         i.ISnowflakeRole
+type GrantActionFutureSchemaGrant[T i.ISnowflakePrincipal] struct {
+	Principal    T
 	DatabaseName string
 	SchemaName   string
 	ObjectType   enum.SnowflakeObject
 }
 
-func (r *RoleFutureSchemaGrant[T]) GetGrantStatement(privileges []enum.Privilege) (string, int) {
+func (r *GrantActionFutureSchemaGrant[T]) GetGrantStatement(privileges []enum.Privilege) (string, int) {
 	stringPrivileges := lo.Map(privileges, func(x enum.Privilege, index int) string { return x.String() })
 	privs := strings.Join(stringPrivileges, ", ")
-	if r.Role.IsDatabaseRole() {
-		return fmt.Sprintf("GRANT %[1]s ON FUTURE %[2]s IN SCHEMA %[3]s.%[4]s TO DATABASE ROLE %[5]s;", privs, r.ObjectType.ToPlural(), r.DatabaseName, r.SchemaName, r.Role.GetIdentifier()), 1
 
+	switch any(r.Principal).(type) {
+	case *Role:
+		return fmt.Sprintf("GRANT %[1]s ON FUTURE %[2]s IN SCHEMA %[3]s.%[4]s TO ROLE %[5]s;", privs, r.ObjectType.ToPlural(), r.DatabaseName, r.SchemaName, r.Principal.GetIdentifier()), 1
+	case *DatabaseRole:
+		return fmt.Sprintf("GRANT %[1]s ON FUTURE %[2]s IN SCHEMA %[3]s.%[4]s TO DATABASE ROLE %[5]s;", privs, r.ObjectType.ToPlural(), r.DatabaseName, r.SchemaName, r.Principal.GetIdentifier()), 1
+	default:
+		panic("GetGrantStatement is not implemented for this interface type")
 	}
-	return fmt.Sprintf("GRANT %[1]s ON FUTURE %[2]s IN SCHEMA %[3]s.%[4]s TO ROLE %[5]s;", privs, r.ObjectType.ToPlural(), r.DatabaseName, r.SchemaName, r.Role.GetIdentifier()), 1
 }
 
-func (r *RoleFutureSchemaGrant[T]) GetRevokeStatement(privileges []enum.Privilege) (string, int) {
+func (r *GrantActionFutureSchemaGrant[T]) GetRevokeStatement(privileges []enum.Privilege) (string, int) {
 	stringPrivileges := lo.Map(privileges, func(x enum.Privilege, index int) string { return x.String() })
 	privs := strings.Join(stringPrivileges, ", ")
-	if r.Role.IsDatabaseRole() {
-		return fmt.Sprintf("REVOKE %[1]s ON FUTURE %[2]s IN SCHEMA %[3]s.%[4]s FROM DATABASE ROLE %[5]s CASCADE;", privs, r.ObjectType.ToPlural(), r.DatabaseName, r.SchemaName, r.Role.GetIdentifier()), 1
+
+	switch any(r.Principal).(type) {
+	case *Role:
+		return fmt.Sprintf("REVOKE %[1]s ON FUTURE %[2]s IN SCHEMA %[3]s.%[4]s FROM ROLE %[5]s CASCADE;", privs, r.ObjectType.ToPlural(), r.DatabaseName, r.SchemaName, r.Principal.GetIdentifier()), 1
+	case *DatabaseRole:
+		return fmt.Sprintf("REVOKE %[1]s ON FUTURE %[2]s IN SCHEMA %[3]s.%[4]s FROM DATABASE ROLE %[5]s CASCADE;", privs, r.ObjectType.ToPlural(), r.DatabaseName, r.SchemaName, r.Principal.GetIdentifier()), 1
+	default:
+		panic("GetGrantStatement is not implemented for this interface type")
 	}
-	return fmt.Sprintf("REVOKE %[1]s ON FUTURE %[2]s IN SCHEMA %[3]s.%[4]s FROM ROLE %[5]s CASCADE;", privs, r.ObjectType.ToPlural(), r.DatabaseName, r.SchemaName, r.Role.GetIdentifier()), 1
 }
 
-func (r *RoleFutureSchemaGrant[T]) validatePrivileges(privileges []enum.Privilege) bool {
+func (r *GrantActionFutureSchemaGrant[T]) ValidatePrivileges(privileges []enum.Privilege) bool {
 	var allowedPrivileges []enum.Privilege
 
 	switch r.ObjectType {

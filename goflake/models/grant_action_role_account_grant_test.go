@@ -10,8 +10,8 @@ import (
 	i "github.com/tsanton/goflake-client/goflake/integration"
 	a "github.com/tsanton/goflake-client/goflake/models/assets"
 	ai "github.com/tsanton/goflake-client/goflake/models/assets/interface"
-	dg "github.com/tsanton/goflake-client/goflake/models/describables/grants"
-	eg "github.com/tsanton/goflake-client/goflake/models/entities/grants"
+	d "github.com/tsanton/goflake-client/goflake/models/describables"
+	e "github.com/tsanton/goflake-client/goflake/models/entities"
 	"github.com/tsanton/goflake-client/goflake/models/enums"
 	u "github.com/tsanton/goflake-client/goflake/utilities"
 )
@@ -37,15 +37,12 @@ func Test_grant_role_account_privilege(t *testing.T) {
 	i.ErrorFailNow(t, g.RegisterAsset(cli, &role, &stack))
 	i.ErrorFailNow(t, g.RegisterAsset(cli, &privilege, &stack))
 
-	res, err := g.Describe[*eg.RoleGrants](cli, &dg.RoleGrant{RoleName: "IGT_DEMO_ROLE"})
+	grants, err := g.DescribeMany[*e.Grant](cli, &d.Grant{Principal: &d.Role{Name: role.Name}})
 
 	/* Assert */
 	i.ErrorFailNow(t, err)
-	assert.Equal(t, role.Name, res.RoleName)
-	assert.Len(t, res.Grants, 1)
-	createAcc, ok := lo.Find(res.Grants, func(i eg.RoleGrant) bool {
-		return i.Privilege == enums.PrivilegeCreateAccount
-	})
+	assert.Len(t, grants, 1)
+	createAcc, ok := lo.Find(grants, func(i *e.Grant) bool { return i.Privilege == enums.PrivilegeCreateAccount })
 	assert.True(t, ok)
 	assert.Equal(t, "ACCOUNTADMIN", createAcc.GrantedBy)
 	assert.Equal(t, enums.SnowflakeObjectAccount, createAcc.GrantedOn)
@@ -72,19 +69,18 @@ func Test_grant_role_account_privileges(t *testing.T) {
 	i.ErrorFailNow(t, g.RegisterAsset(cli, &role, &stack))
 	i.ErrorFailNow(t, g.RegisterAsset(cli, &privilege, &stack))
 
-	res, err := g.Describe[*eg.RoleGrants](cli, &dg.RoleGrant{RoleName: "IGT_DEMO_ROLE"})
+	grants, err := g.DescribeMany[*e.Grant](cli, &d.Grant{Principal: &d.Role{Name: role.Name}})
 
 	/* Assert */
 	i.ErrorFailNow(t, err)
-	assert.Equal(t, role.Name, res.RoleName)
-	assert.Len(t, res.Grants, 2)
+	assert.Len(t, grants, 2)
 
-	createAcc, ok := lo.Find(res.Grants, func(i eg.RoleGrant) bool { return i.Privilege == enums.PrivilegeCreateAccount })
+	createAcc, ok := lo.Find(grants, func(i *e.Grant) bool { return i.Privilege == enums.PrivilegeCreateAccount })
 	assert.True(t, ok)
 	assert.Equal(t, "ACCOUNTADMIN", createAcc.GrantedBy)
 	assert.Equal(t, enums.SnowflakeObjectAccount, createAcc.GrantedOn)
 
-	createUser, ok := lo.Find(res.Grants, func(i eg.RoleGrant) bool { return i.Privilege == enums.PrivilegeCreateUser })
+	createUser, ok := lo.Find(grants, func(i *e.Grant) bool { return i.Privilege == enums.PrivilegeCreateUser })
 	assert.True(t, ok)
 	assert.Equal(t, "USERADMIN", createUser.GrantedBy)
 	assert.Equal(t, enums.SnowflakeObjectAccount, createUser.GrantedOn)

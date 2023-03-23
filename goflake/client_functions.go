@@ -58,8 +58,30 @@ func DeleteAsset(g *GoflakeClient, asset ai.ISnowflakeAsset) error {
 	return err
 }
 
-func Describe[T e.ISnowflakeEntity](g *GoflakeClient, obj d.ISnowflakeDescribable) (T, error) {
+func DescribeOne[T e.ISnowflakeEntity](g *GoflakeClient, obj d.ISnowflakeDescribable) (T, error) {
 	var ret T
+	if obj.IsProcedure() {
+		var procedureResponse string
+		err := g.db.Get(&procedureResponse, obj.GetDescribeStatement())
+		if err != nil {
+			return ret, err
+		}
+		err = json.Unmarshal([]byte(procedureResponse), &ret)
+		if err != nil {
+			return ret, err
+		}
+	} else {
+		err := g.db.Get(&ret, obj.GetDescribeStatement())
+		if err != nil {
+			return ret, err
+		}
+	}
+
+	return ret, nil
+}
+
+func DescribeMany[T e.ISnowflakeEntity](g *GoflakeClient, obj d.ISnowflakeDescribable) ([]T, error) {
+	var ret []T
 	if obj.IsProcedure() {
 		var procedureResponse string
 		err := g.db.Get(&procedureResponse, obj.GetDescribeStatement())

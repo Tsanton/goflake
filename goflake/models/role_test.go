@@ -23,7 +23,7 @@ func Test_create_role(t *testing.T) {
 	role := a.Role{
 		Name:    "IGT_DEMO_ROLE",
 		Comment: "integration test goflake",
-		Owner:   "USERADMIN",
+		Owner:   &a.Role{Name: "USERADMIN"},
 	}
 
 	/* Act */
@@ -40,16 +40,16 @@ func Test_describe_role(t *testing.T) {
 	r := a.Role{
 		Name:    "IGT_DEMO_ROLE",
 		Comment: "integration test goflake",
-		Owner:   "USERADMIN",
+		Owner:   &a.Role{Name: "USERADMIN"},
 	}
 
 	i.ErrorFailNow(t, g.RegisterAsset(cli, &r, &stack))
 
 	/* Act */
-	dr, err := g.Describe[e.Role](cli, &d.Role{Name: r.Name})
+	dr, err := g.DescribeOne[e.Role](cli, &d.Role{Name: r.Name})
 	i.ErrorFailNow(t, err)
 
 	/* Assert */
 	assert.Equal(t, r.Name, dr.Name)
-	assert.Equal(t, r.Owner, dr.Owner)
+	assert.Equal(t, r.Owner.GetIdentifier(), dr.Owner)
 }
