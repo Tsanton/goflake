@@ -27,7 +27,7 @@ func (r *DatabaseRole) GetCreateStatement() (string, int) {
 	return fmt.Sprintf(`
 	CREATE OR REPLACE DATABASE ROLE %[1]s COMMENT = '%[2]s';
 	GRANT OWNERSHIP ON DATABASE ROLE %[1]s TO %[3]s REVOKE CURRENT GRANTS;`,
-		r.GetIdentifier(), r.Comment, r.Owner,
+		r.GetIdentifier(), r.Comment, r.Owner.GetIdentifier(),
 	), 2
 }
 

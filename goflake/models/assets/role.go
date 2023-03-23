@@ -13,16 +13,24 @@ var (
 
 type Role struct {
 	Name    string
-	Owner   string
+	Owner   i.ISnowflakePrincipal
 	Comment string
-	//TODO: DatabaseName string: if != nil then https://docs.snowflake.com/en/sql-reference/sql/create-database-role.html
 }
 
 func (r *Role) GetCreateStatement() (string, int) {
+	var principalType string
+	switch r.Owner.(type) {
+	case *Role:
+		principalType = "ROLE"
+	case *DatabaseRole:
+		principalType = "DATABASE ROLE"
+	default:
+		panic("Ownership for this principal type is not implemented")
+	}
 	return fmt.Sprintf(`
 	CREATE OR REPLACE ROLE %[1]s COMMENT = '%[2]s';
-	GRANT OWNERSHIP ON ROLE %[1]s TO %[3]s REVOKE CURRENT GRANTS;`,
-		r.Name, r.Comment, r.Owner,
+	GRANT OWNERSHIP ON ROLE %[1]s TO %[3]s %[4]s REVOKE CURRENT GRANTS;`,
+		r.Name, r.Comment, principalType, r.Owner.GetIdentifier(),
 	), 2
 }
 

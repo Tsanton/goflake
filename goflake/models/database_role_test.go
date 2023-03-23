@@ -23,14 +23,14 @@ func Test_create_database_role(t *testing.T) {
 	db := a.Database{
 		Name:    "IGT_DATABASE_ROLES",
 		Comment: "integration test goflake",
-		Owner:   "SYSADMIN",
+		Owner:   &a.Role{Name: "SYSADMIN"},
 	}
 
 	role := a.DatabaseRole{
 		Name:         "IGT_DEMO_ROLE",
 		DatabaseName: db.Name,
 		Comment:      "integration test goflake",
-		Owner:        "USERADMIN",
+		Owner:        &a.Role{Name: "USERADMIN"},
 	}
 
 	/* Act */
@@ -48,14 +48,14 @@ func Test_describe_database_role(t *testing.T) {
 	db := a.Database{
 		Name:    "IGT_DATABASE_ROLES",
 		Comment: "integration test goflake",
-		Owner:   "SYSADMIN",
+		Owner:   &a.Role{Name: "SYSADMIN"},
 	}
 
 	role := a.DatabaseRole{
 		Name:         "IGT_DEMO_ROLE",
 		DatabaseName: db.Name,
 		Comment:      "integration test goflake",
-		Owner:        "USERADMIN",
+		Owner:        &a.Role{Name: "USERADMIN"},
 	}
 
 	i.ErrorFailNow(t, g.RegisterAsset(cli, &db, &stack))
@@ -67,6 +67,6 @@ func Test_describe_database_role(t *testing.T) {
 
 	/* Assert */
 	assert.Equal(t, role.Name, dr.Name)
-	assert.Equal(t, role.Owner, dr.Owner)
+	assert.Equal(t, role.Owner.GetIdentifier(), dr.Owner)
 	assert.Equal(t, role.DatabaseName, db.Name)
 }

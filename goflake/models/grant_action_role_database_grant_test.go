@@ -16,24 +16,30 @@ import (
 	u "github.com/tsanton/goflake-client/goflake/utilities"
 )
 
-func Test_grant_role_account_privilege(t *testing.T) {
+func Test_grant_role_database_privilege(t *testing.T) {
 	/* Arrange */
 	cli := i.Goflake()
 	defer cli.Close()
 	stack := u.Stack[ai.ISnowflakeAsset]{}
 	defer g.DeleteAssets(cli, &stack)
 
+	db := a.Database{
+		Name:    "IGT_DEMO",
+		Comment: "integration test goflake",
+		Owner:   &a.Role{Name: "SYSADMIN"},
+	}
 	role := a.Role{
 		Name:    "IGT_DEMO_ROLE",
 		Comment: "integration test goflake",
 		Owner:   &a.Role{Name: "USERADMIN"},
 	}
 	privilege := a.GrantAction{
-		Target:     &a.GrantActionAccountGrant[*a.Role]{Principal: &role},
-		Privileges: []enums.Privilege{enums.PrivilegeCreateAccount},
+		Target:     &a.GrantActionDatabaseGrant[*a.Role]{Principal: &role, DatabaseName: db.Name},
+		Privileges: []enums.Privilege{enums.PrivilegeUsage},
 	}
 
 	/* Act */
+	i.ErrorFailNow(t, g.RegisterAsset(cli, &db, &stack))
 	i.ErrorFailNow(t, g.RegisterAsset(cli, &role, &stack))
 	i.ErrorFailNow(t, g.RegisterAsset(cli, &privilege, &stack))
 
@@ -43,32 +49,36 @@ func Test_grant_role_account_privilege(t *testing.T) {
 	i.ErrorFailNow(t, err)
 	assert.Equal(t, role.Name, res.RoleName)
 	assert.Len(t, res.Grants, 1)
-	createAcc, ok := lo.Find(res.Grants, func(i eg.RoleGrant) bool {
-		return i.Privilege == enums.PrivilegeCreateAccount
-	})
+	dbUsage, ok := lo.Find(res.Grants, func(i eg.RoleGrant) bool { return i.Privilege == enums.PrivilegeUsage })
 	assert.True(t, ok)
-	assert.Equal(t, "ACCOUNTADMIN", createAcc.GrantedBy)
-	assert.Equal(t, enums.SnowflakeObjectAccount, createAcc.GrantedOn)
+	assert.Equal(t, "SYSADMIN", dbUsage.GrantedBy)
+	assert.Equal(t, enums.SnowflakeObjectDatabase, dbUsage.GrantedOn)
 }
 
-func Test_grant_role_account_privileges(t *testing.T) {
+func Test_grant_role_database_privileges(t *testing.T) {
 	/* Arrange */
 	cli := i.Goflake()
 	defer cli.Close()
 	stack := u.Stack[ai.ISnowflakeAsset]{}
 	defer g.DeleteAssets(cli, &stack)
 
+	db := a.Database{
+		Name:    "IGT_DEMO",
+		Comment: "integration test goflake",
+		Owner:   &a.Role{Name: "SYSADMIN"},
+	}
 	role := a.Role{
 		Name:    "IGT_DEMO_ROLE",
 		Comment: "integration test goflake",
 		Owner:   &a.Role{Name: "USERADMIN"},
 	}
 	privilege := a.GrantAction{
-		Target:     &a.GrantActionAccountGrant[*a.Role]{Principal: &role},
-		Privileges: []enums.Privilege{enums.PrivilegeCreateAccount, enums.PrivilegeCreateUser},
+		Target:     &a.GrantActionDatabaseGrant[*a.Role]{Principal: &role, DatabaseName: db.Name},
+		Privileges: []enums.Privilege{enums.PrivilegeUsage, enums.PrivilegeMonitor},
 	}
 
 	/* Act */
+	i.ErrorFailNow(t, g.RegisterAsset(cli, &db, &stack))
 	i.ErrorFailNow(t, g.RegisterAsset(cli, &role, &stack))
 	i.ErrorFailNow(t, g.RegisterAsset(cli, &privilege, &stack))
 
@@ -79,13 +89,13 @@ func Test_grant_role_account_privileges(t *testing.T) {
 	assert.Equal(t, role.Name, res.RoleName)
 	assert.Len(t, res.Grants, 2)
 
-	createAcc, ok := lo.Find(res.Grants, func(i eg.RoleGrant) bool { return i.Privilege == enums.PrivilegeCreateAccount })
+	dbUsage, ok := lo.Find(res.Grants, func(i eg.RoleGrant) bool { return i.Privilege == enums.PrivilegeUsage })
 	assert.True(t, ok)
-	assert.Equal(t, "ACCOUNTADMIN", createAcc.GrantedBy)
-	assert.Equal(t, enums.SnowflakeObjectAccount, createAcc.GrantedOn)
+	assert.Equal(t, "SYSADMIN", dbUsage.GrantedBy)
+	assert.Equal(t, enums.SnowflakeObjectDatabase, dbUsage.GrantedOn)
 
-	createUser, ok := lo.Find(res.Grants, func(i eg.RoleGrant) bool { return i.Privilege == enums.PrivilegeCreateUser })
+	dbMonitor, ok := lo.Find(res.Grants, func(i eg.RoleGrant) bool { return i.Privilege == enums.PrivilegeMonitor })
 	assert.True(t, ok)
-	assert.Equal(t, "USERADMIN", createUser.GrantedBy)
-	assert.Equal(t, enums.SnowflakeObjectAccount, createUser.GrantedOn)
+	assert.Equal(t, "SYSADMIN", dbMonitor.GrantedBy)
+	assert.Equal(t, enums.SnowflakeObjectDatabase, dbMonitor.GrantedOn)
 }

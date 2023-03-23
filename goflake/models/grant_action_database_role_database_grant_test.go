@@ -9,7 +9,6 @@ import (
 	g "github.com/tsanton/goflake-client/goflake"
 	i "github.com/tsanton/goflake-client/goflake/integration"
 	a "github.com/tsanton/goflake-client/goflake/models/assets"
-	ag "github.com/tsanton/goflake-client/goflake/models/assets/grants"
 	ai "github.com/tsanton/goflake-client/goflake/models/assets/interface"
 	dg "github.com/tsanton/goflake-client/goflake/models/describables/grants"
 	eg "github.com/tsanton/goflake-client/goflake/models/entities/grants"
@@ -27,29 +26,29 @@ func Test_grant_database_role_database_privilege(t *testing.T) {
 	db := a.Database{
 		Name:    "IGT_DATABASE_ROLES",
 		Comment: "integration test goflake",
-		Owner:   "SYSADMIN",
+		Owner:   &a.Role{Name: "SYSADMIN"},
 	}
-	role := a.DatabaseRole{
+	databaseRole := a.DatabaseRole{
 		Name:         "IGT_DEMO_ROLE",
 		DatabaseName: db.Name,
 		Comment:      "integration test goflake",
-		Owner:        "USERADMIN",
+		Owner:        &a.Role{Name: "USERADMIN"},
 	}
-	privilege := a.Grant{
-		Target:     &ag.RoleDatabaseGrant[*a.Role]{Role: &role, DatabaseName: db.Name},
+	privilege := a.GrantAction{
+		Target:     &a.GrantActionDatabaseGrant[*a.DatabaseRole]{Principal: &databaseRole, DatabaseName: db.Name},
 		Privileges: []enums.Privilege{enums.PrivilegeCreateDatabaseRole},
 	}
 
 	/* Act */
 	i.ErrorFailNow(t, g.RegisterAsset(cli, &db, &stack))
-	i.ErrorFailNow(t, g.RegisterAsset(cli, &role, &stack))
+	i.ErrorFailNow(t, g.RegisterAsset(cli, &databaseRole, &stack))
 	i.ErrorFailNow(t, g.RegisterAsset(cli, &privilege, &stack))
 
 	res, err := g.Describe[*eg.RoleGrants](cli, &dg.DatabaseRoleGrant{RoleName: "IGT_DEMO_ROLE", DatabaseName: db.Name})
 
 	/* Assert */
 	i.ErrorFailNow(t, err)
-	assert.Equal(t, role.Name, res.RoleName)
+	assert.Equal(t, databaseRole.Name, res.RoleName)
 	assert.Len(t, res.Grants, 2) //Database roles are created with usage on database
 	dbCreateRole, ok := lo.Find(res.Grants, func(i eg.RoleGrant) bool { return i.Privilege == enums.PrivilegeCreateDatabaseRole })
 	assert.True(t, ok)
@@ -67,29 +66,29 @@ func Test_grant_database_role_database_privileges(t *testing.T) {
 	db := a.Database{
 		Name:    "IGT_DEMO",
 		Comment: "integration test goflake",
-		Owner:   "SYSADMIN",
+		Owner:   &a.Role{Name: "SYSADMIN"},
 	}
-	role := a.DatabaseRole{
+	databaseRole := a.DatabaseRole{
 		Name:         "IGT_DEMO_ROLE",
 		DatabaseName: db.Name,
 		Comment:      "integration test goflake",
-		Owner:        "USERADMIN",
+		Owner:        &a.Role{Name: "USERADMIN"},
 	}
-	privilege := a.Grant{
-		Target:     &ag.RoleDatabaseGrant[*a.Role]{Role: &role, DatabaseName: db.Name},
+	privilege := a.GrantAction{
+		Target:     &a.GrantActionDatabaseGrant[*a.DatabaseRole]{Principal: &databaseRole, DatabaseName: db.Name},
 		Privileges: []enums.Privilege{enums.PrivilegeCreateDatabaseRole, enums.PrivilegeMonitor},
 	}
 
 	/* Act */
 	i.ErrorFailNow(t, g.RegisterAsset(cli, &db, &stack))
-	i.ErrorFailNow(t, g.RegisterAsset(cli, &role, &stack))
+	i.ErrorFailNow(t, g.RegisterAsset(cli, &databaseRole, &stack))
 	i.ErrorFailNow(t, g.RegisterAsset(cli, &privilege, &stack))
 
 	res, err := g.Describe[*eg.RoleGrants](cli, &dg.DatabaseRoleGrant{RoleName: "IGT_DEMO_ROLE", DatabaseName: db.Name})
 
 	/* Assert */
 	i.ErrorFailNow(t, err)
-	assert.Equal(t, role.Name, res.RoleName)
+	assert.Equal(t, databaseRole.Name, res.RoleName)
 	assert.Len(t, res.Grants, 3) //Database roles are created with usage on database
 
 	dbCreateRole, ok := lo.Find(res.Grants, func(i eg.RoleGrant) bool { return i.Privilege == enums.PrivilegeCreateDatabaseRole })
