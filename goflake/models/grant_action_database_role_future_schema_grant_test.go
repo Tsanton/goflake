@@ -63,7 +63,7 @@ func Test_grant_database_role_future_schema_privilege(t *testing.T) {
 	assert.Equal(t, fmt.Sprintf("%[1]s.%[2]s.<%[3]s>", db.Name, schema.Name, enums.SnowflakeObjectTable.ToSingular()), schemaFutureSelect.GrantedIdentifier)
 }
 
-func Test_grant_role_future_schema_privileges(t *testing.T) {
+func Test_grant_database_role_future_schema_privileges(t *testing.T) {
 	/* Arrange */
 	cli := i.Goflake()
 	defer cli.Close()
@@ -81,29 +81,30 @@ func Test_grant_role_future_schema_privileges(t *testing.T) {
 		Comment:  "integration test goflake",
 		Owner:    &a.Role{Name: "SYSADMIN"},
 	}
-	role := a.Role{
-		Name:    "IGT_DEMO_ROLE",
-		Comment: "integration test goflake",
-		Owner:   &a.Role{Name: "USERADMIN"},
+	databaseRole := a.DatabaseRole{
+		Name:         "IGT_DEMO_ROLE",
+		DatabaseName: db.Name,
+		Comment:      "integration test goflake",
+		Owner:        &a.Role{Name: "USERADMIN"},
 	}
 	privilege1 := a.GrantAction{
-		Target:     &a.GrantActionFutureSchemaGrant[*a.Role]{Principal: &role, DatabaseName: db.Name, SchemaName: schema.Name, ObjectType: enums.SnowflakeObjectTable},
+		Target:     &a.GrantActionFutureSchemaGrant[*a.DatabaseRole]{Principal: &databaseRole, DatabaseName: db.Name, SchemaName: schema.Name, ObjectType: enums.SnowflakeObjectTable},
 		Privileges: []enums.Privilege{enums.PrivilegeSelect, enums.PrivilegeUpdate},
 	}
 
 	privilege2 := a.GrantAction{
-		Target:     &a.GrantActionFutureSchemaGrant[*a.Role]{Principal: &role, DatabaseName: db.Name, SchemaName: schema.Name, ObjectType: enums.SnowflakeObjectView},
+		Target:     &a.GrantActionFutureSchemaGrant[*a.DatabaseRole]{Principal: &databaseRole, DatabaseName: db.Name, SchemaName: schema.Name, ObjectType: enums.SnowflakeObjectView},
 		Privileges: []enums.Privilege{enums.PrivilegeSelect, enums.PrivilegeReferences},
 	}
 
 	/* Act */
 	i.ErrorFailNow(t, g.RegisterAsset(cli, &db, &stack))
 	i.ErrorFailNow(t, g.RegisterAsset(cli, &schema, &stack))
-	i.ErrorFailNow(t, g.RegisterAsset(cli, &role, &stack))
+	i.ErrorFailNow(t, g.RegisterAsset(cli, &databaseRole, &stack))
 	i.ErrorFailNow(t, g.RegisterAsset(cli, &privilege1, &stack))
 	i.ErrorFailNow(t, g.RegisterAsset(cli, &privilege2, &stack))
 
-	grants, err := g.DescribeMany[*e.FutureGrant](cli, &d.FutureGrant{Principal: &d.Role{Name: role.Name}})
+	grants, err := g.DescribeMany[*e.FutureGrant](cli, &d.FutureGrant{Principal: &d.DatabaseRole{Name: databaseRole.Name, DatabaseName: databaseRole.DatabaseName}})
 
 	/* Assert */
 	i.ErrorFailNow(t, err)

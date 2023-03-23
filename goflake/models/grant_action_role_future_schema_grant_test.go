@@ -10,10 +10,9 @@ import (
 	g "github.com/tsanton/goflake-client/goflake"
 	i "github.com/tsanton/goflake-client/goflake/integration"
 	a "github.com/tsanton/goflake-client/goflake/models/assets"
-	ag "github.com/tsanton/goflake-client/goflake/models/assets/grants"
 	ai "github.com/tsanton/goflake-client/goflake/models/assets/interface"
-	dg "github.com/tsanton/goflake-client/goflake/models/describables/grants"
-	eg "github.com/tsanton/goflake-client/goflake/models/entities/grants"
+	d "github.com/tsanton/goflake-client/goflake/models/describables"
+	e "github.com/tsanton/goflake-client/goflake/models/entities"
 	"github.com/tsanton/goflake-client/goflake/models/enums"
 	u "github.com/tsanton/goflake-client/goflake/utilities"
 )
@@ -28,21 +27,21 @@ func Test_grant_role_future_schema_privilege(t *testing.T) {
 	db := a.Database{
 		Name:    "IGT_DEMO",
 		Comment: "integration test goflake",
-		Owner:   "SYSADMIN",
+		Owner:   &a.Role{Name: "SYSADMIN"},
 	}
 	schema := a.Schema{
 		Database: db,
 		Name:     "IGT_GRANT",
 		Comment:  "integration test goflake",
-		Owner:    "SYSADMIN",
+		Owner:    &a.Role{Name: "SYSADMIN"},
 	}
 	role := a.Role{
 		Name:    "IGT_DEMO_ROLE",
 		Comment: "integration test goflake",
-		Owner:   "USERADMIN",
+		Owner:   &a.Role{Name: "USERADMIN"},
 	}
-	privilege := a.Grant{
-		Target:     &ag.RoleFutureSchemaGrant[*a.Role]{Role: &role, DatabaseName: db.Name, SchemaName: schema.Name, ObjectType: enums.SnowflakeObjectTable},
+	privilege := a.GrantAction{
+		Target:     &a.GrantActionFutureSchemaGrant[*a.Role]{Principal: &role, DatabaseName: db.Name, SchemaName: schema.Name, ObjectType: enums.SnowflakeObjectTable},
 		Privileges: []enums.Privilege{enums.PrivilegeSelect},
 	}
 
@@ -52,18 +51,15 @@ func Test_grant_role_future_schema_privilege(t *testing.T) {
 	i.ErrorFailNow(t, g.RegisterAsset(cli, &role, &stack))
 	i.ErrorFailNow(t, g.RegisterAsset(cli, &privilege, &stack))
 
-	res, err := g.Describe[*eg.RoleFutureGrants](cli, &dg.RoleFutureGrant{RoleName: role.Name})
+	grants, err := g.DescribeMany[*e.FutureGrant](cli, &d.FutureGrant{Principal: &d.Role{Name: role.Name}})
 
 	/* Assert */
 	i.ErrorFailNow(t, err)
-	assert.Equal(t, role.Name, res.RoleName)
-	assert.Len(t, res.Grants, 1)
-	schemaFutureSelect, ok := lo.Find(res.Grants, func(i eg.RoleFutureGrant) bool {
-		return i.Privilege == enums.Privilege(enums.PrivilegeSelect.String())
-	})
+	assert.Len(t, grants, 1)
+	schemaFutureSelect, ok := lo.Find(grants, func(i *e.FutureGrant) bool { return i.Privilege == enums.Privilege(enums.PrivilegeSelect.String()) })
 	assert.True(t, ok)
 	assert.Equal(t, schemaFutureSelect.GrantedOn, enums.SnowflakeObjectTable)
-	assert.Equal(t, fmt.Sprintf("%[1]s.%[2]s.<%[3]s>", db.Name, schema.Name, enums.SnowflakeObjectTable.ToSingular()), schemaFutureSelect.GrantTargetName)
+	assert.Equal(t, fmt.Sprintf("%[1]s.%[2]s.<%[3]s>", db.Name, schema.Name, enums.SnowflakeObjectTable.ToSingular()), schemaFutureSelect.GrantedIdentifier)
 }
 
 func Test_grant_role_future_schema_privileges(t *testing.T) {
@@ -76,25 +72,25 @@ func Test_grant_role_future_schema_privileges(t *testing.T) {
 	db := a.Database{
 		Name:    "IGT_DEMO",
 		Comment: "integration test goflake",
-		Owner:   "SYSADMIN",
+		Owner:   &a.Role{Name: "SYSADMIN"},
 	}
 	schema := a.Schema{
 		Database: db,
 		Name:     "IGT_GRANT",
 		Comment:  "integration test goflake",
-		Owner:    "SYSADMIN",
+		Owner:    &a.Role{Name: "SYSADMIN"},
 	}
 	role := a.Role{
 		Name:    "IGT_DEMO_ROLE",
 		Comment: "integration test goflake",
-		Owner:   "USERADMIN",
+		Owner:   &a.Role{Name: "USERADMIN"},
 	}
-	privilege1 := a.Grant{
-		Target:     &ag.RoleFutureSchemaGrant[*a.Role]{Role: &role, DatabaseName: db.Name, SchemaName: schema.Name, ObjectType: enums.SnowflakeObjectTable},
+	privilege1 := a.GrantAction{
+		Target:     &a.GrantActionFutureSchemaGrant[*a.Role]{Principal: &role, DatabaseName: db.Name, SchemaName: schema.Name, ObjectType: enums.SnowflakeObjectTable},
 		Privileges: []enums.Privilege{enums.PrivilegeSelect, enums.PrivilegeUpdate},
 	}
-	privilege2 := a.Grant{
-		Target:     &ag.RoleFutureSchemaGrant[*a.Role]{Role: &role, DatabaseName: db.Name, SchemaName: schema.Name, ObjectType: enums.SnowflakeObjectView},
+	privilege2 := a.GrantAction{
+		Target:     &a.GrantActionFutureSchemaGrant[*a.Role]{Principal: &role, DatabaseName: db.Name, SchemaName: schema.Name, ObjectType: enums.SnowflakeObjectView},
 		Privileges: []enums.Privilege{enums.PrivilegeSelect, enums.PrivilegeReferences},
 	}
 
@@ -105,32 +101,31 @@ func Test_grant_role_future_schema_privileges(t *testing.T) {
 	i.ErrorFailNow(t, g.RegisterAsset(cli, &privilege1, &stack))
 	i.ErrorFailNow(t, g.RegisterAsset(cli, &privilege2, &stack))
 
-	res, err := g.Describe[*eg.RoleFutureGrants](cli, &dg.RoleFutureGrant{RoleName: role.Name})
+	grants, err := g.DescribeMany[*e.FutureGrant](cli, &d.FutureGrant{Principal: &d.Role{Name: role.Name}})
 
 	/* Assert */
 	i.ErrorFailNow(t, err)
-	assert.Equal(t, role.Name, res.RoleName)
-	assert.Len(t, res.Grants, 4)
+	assert.Len(t, grants, 4)
 
 	tableSchemaScope := fmt.Sprintf("%[1]s.%[2]s.<%[3]s>", db.Name, schema.Name, enums.SnowflakeObjectTable.ToSingular())
-	_, ok := lo.Find(res.Grants, func(i eg.RoleFutureGrant) bool {
-		return i.Privilege == enums.PrivilegeSelect && i.GrantTargetName == tableSchemaScope
+	_, ok := lo.Find(grants, func(i *e.FutureGrant) bool {
+		return i.Privilege == enums.PrivilegeSelect && i.GrantedIdentifier == tableSchemaScope
 	})
 	assert.True(t, ok)
 
-	_, ok = lo.Find(res.Grants, func(i eg.RoleFutureGrant) bool {
-		return i.Privilege == enums.PrivilegeUpdate && i.GrantTargetName == tableSchemaScope
+	_, ok = lo.Find(grants, func(i *e.FutureGrant) bool {
+		return i.Privilege == enums.PrivilegeUpdate && i.GrantedIdentifier == tableSchemaScope
 	})
 	assert.True(t, ok)
 
 	viewSchemaScope := fmt.Sprintf("%[1]s.%[2]s.<%[3]s>", db.Name, schema.Name, enums.SnowflakeObjectView.ToSingular())
-	_, ok = lo.Find(res.Grants, func(i eg.RoleFutureGrant) bool {
-		return i.Privilege == enums.PrivilegeSelect && i.GrantTargetName == viewSchemaScope
+	_, ok = lo.Find(grants, func(i *e.FutureGrant) bool {
+		return i.Privilege == enums.PrivilegeSelect && i.GrantedIdentifier == viewSchemaScope
 	})
 	assert.True(t, ok)
 
-	_, ok = lo.Find(res.Grants, func(i eg.RoleFutureGrant) bool {
-		return i.Privilege == enums.PrivilegeReferences && i.GrantTargetName == viewSchemaScope
+	_, ok = lo.Find(grants, func(i *e.FutureGrant) bool {
+		return i.Privilege == enums.PrivilegeReferences && i.GrantedIdentifier == viewSchemaScope
 	})
 	assert.True(t, ok)
 }

@@ -22,12 +22,12 @@ func Test_create_role_relationship(t *testing.T) {
 	rc := a.Role{
 		Name:    "IGT_CHILD_ROLE",
 		Comment: "integration test goflake",
-		Owner:   "USERADMIN",
+		Owner:   &a.Role{Name: "USERADMIN"},
 	}
 	rp := a.Role{
 		Name:    "IGT_PARENT_ROLE",
 		Comment: "integration test goflake",
-		Owner:   "USERADMIN",
+		Owner:   &a.Role{Name: "USERADMIN"},
 	}
 	rel := a.RoleRelationship{
 		ChildRoleName:  rc.Name,
@@ -38,8 +38,8 @@ func Test_create_role_relationship(t *testing.T) {
 
 	/* Act */
 	i.ErrorFailNow(t, g.RegisterAsset(cli, &rel, &stack))
-	child, cerr := g.Describe[e.Role](cli, &d.Role{Name: rc.Name})
-	parent, perr := g.Describe[e.Role](cli, &d.Role{Name: rp.Name})
+	child, cerr := g.DescribeOne[e.Role](cli, &d.Role{Name: rc.Name})
+	parent, perr := g.DescribeOne[e.Role](cli, &d.Role{Name: rp.Name})
 
 	/* Assert */
 	if cerr != nil || rc.Name != child.Name || child.GrantedToRoles != 1 {
@@ -61,12 +61,12 @@ func Test_describe_role_relationship(t *testing.T) {
 	rc := a.Role{
 		Name:    "IGT_CHILD_ROLE",
 		Comment: "integration test goflake",
-		Owner:   "USERADMIN",
+		Owner:   &a.Role{Name: "USERADMIN"},
 	}
 	rp := a.Role{
 		Name:    "IGT_PARENT_ROLE",
 		Comment: "integration test goflake",
-		Owner:   "USERADMIN",
+		Owner:   &a.Role{Name: "USERADMIN"},
 	}
 	rel := a.RoleRelationship{
 		ChildRoleName:  rc.Name,
@@ -77,7 +77,7 @@ func Test_describe_role_relationship(t *testing.T) {
 
 	/* Act */
 	i.ErrorFailNow(t, g.RegisterAsset(cli, &rel, &stack))
-	dr, err := g.Describe[e.RoleRelationship](cli, &d.RoleRelationship{ChildRoleName: rc.Name, ParentRoleName: rp.Name})
+	dr, err := g.DescribeOne[e.RoleRelationship](cli, &d.RoleRelationship{ChildRoleName: rc.Name, ParentRoleName: rp.Name})
 	i.ErrorFailNow(t, err)
 
 	/* Assert */
