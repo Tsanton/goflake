@@ -22,25 +22,18 @@ func Test_create_schema(t *testing.T) {
 	db := a.Database{
 		Name:    "IGT_TEST_DB",
 		Comment: "integration test goflake",
-		Owner:   "SYSADMIN",
+		Owner:   &a.Role{Name: "SYSADMIN"},
 	}
 	sch := a.Schema{
 		Database: db,
 		Name:     "IGT_TEST_SCHEMA",
 		Comment:  "integration test goflake",
-		Owner:    "SYSADMIN",
+		Owner:    &a.Role{Name: "SYSADMIN"},
 	}
 	i.ErrorFailNow(t, g.RegisterAsset(cli, &db, &stack))
 
 	/* Act */
 	i.ErrorFailNow(t, g.RegisterAsset(cli, &sch, &stack))
-
-	// exists, err := g.ExecuteScalar[bool](cli, fmt.Sprintf("SHOW DATABASE "))
-
-	// /* Assert */
-	// if !exists || err != nil {
-	// 	t.Fail()
-	// }
 }
 
 func Test_describe_schema(t *testing.T) {
@@ -53,19 +46,19 @@ func Test_describe_schema(t *testing.T) {
 	db := a.Database{
 		Name:    "IGT_TEST_DB",
 		Comment: "integration test goflake",
-		Owner:   "SYSADMIN",
+		Owner:   &a.Role{Name: "SYSADMIN"},
 	}
 	sch := a.Schema{
 		Database: db,
 		Name:     "IGT_TEST_SCHEMA",
 		Comment:  "integration test goflake",
-		Owner:    "SYSADMIN",
+		Owner:    &a.Role{Name: "SYSADMIN"},
 	}
 	i.ErrorFailNow(t, g.RegisterAsset(cli, &db, &stack))
 	i.ErrorFailNow(t, g.RegisterAsset(cli, &sch, &stack))
 
 	/* Act */
-	dsch, err := g.Describe[e.Schema](cli, &d.Schema{
+	dsch, err := g.DescribeOne[e.Schema](cli, &d.Schema{
 		DatabaseName: db.Name,
 		SchemaName:   sch.Name,
 	})
