@@ -19,7 +19,7 @@ func Test_create_table_varchar(t *testing.T) {
 	defer cli.Close()
 	stack := u.Stack[ai.ISnowflakeAsset]{}
 	defer g.DeleteAssets(cli, &stack)
-	db, sch := bootstrapTableAssets(cli, stack)
+	db, sch := bootstrapTableAssets(cli, &stack)
 	tbl := a.Table{
 		DatabaseName: db.Name,
 		SchemaName:   sch.Name,

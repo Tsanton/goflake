@@ -14,7 +14,7 @@ import (
 	u "github.com/tsanton/goflake-client/goflake/utilities"
 )
 
-func bootstrapTableAssets(cli *g.GoflakeClient, stack u.Stack[ai.ISnowflakeAsset]) (a.Database, a.Schema) {
+func bootstrapTableAssets(cli *g.GoflakeClient, stack *u.Stack[ai.ISnowflakeAsset]) (a.Database, a.Schema) {
 	db := a.Database{
 		Name:    "IGT_TEST_DB",
 		Comment: "integration test goflake",
@@ -26,11 +26,25 @@ func bootstrapTableAssets(cli *g.GoflakeClient, stack u.Stack[ai.ISnowflakeAsset
 		Comment:  "integration test goflake",
 		Owner:    &a.Role{Name: "SYSADMIN"},
 	}
-	_ = g.RegisterAsset(cli, &db, &stack)
+	_ = g.RegisterAsset(cli, &db, stack)
 
-	_ = g.RegisterAsset(cli, &sch, &stack)
+	_ = g.RegisterAsset(cli, &sch, stack)
 
 	return db, sch
+}
+
+func Test_describe_non_existing_table(t *testing.T) {
+	cli := i.Goflake()
+	defer cli.Close()
+
+	dbTable, err := g.DescribeOne[e.Table](cli, &d.Table{
+		DatabaseName: "SNOWFLAKE",
+		SchemaName:   "ACCOUNT_USAGE",
+		TableName:    "I_DONT_EXIST_TABLE",
+	})
+
+	assert.Nil(t, err)
+	assert.Equal(t, e.Table{}, dbTable)
 }
 
 func Test_create_table_single_primary_key(t *testing.T) {
@@ -39,7 +53,7 @@ func Test_create_table_single_primary_key(t *testing.T) {
 	defer cli.Close()
 	stack := u.Stack[ai.ISnowflakeAsset]{}
 	defer g.DeleteAssets(cli, &stack)
-	db, sch := bootstrapTableAssets(cli, stack)
+	db, sch := bootstrapTableAssets(cli, &stack)
 	tbl := a.Table{
 		DatabaseName: db.Name,
 		SchemaName:   sch.Name,
@@ -92,7 +106,7 @@ func Test_create_table_composite_primary_key(t *testing.T) {
 	defer cli.Close()
 	stack := u.Stack[ai.ISnowflakeAsset]{}
 	defer g.DeleteAssets(cli, &stack)
-	db, sch := bootstrapTableAssets(cli, stack)
+	db, sch := bootstrapTableAssets(cli, &stack)
 	tbl := a.Table{
 		DatabaseName: db.Name,
 		SchemaName:   sch.Name,
@@ -161,7 +175,7 @@ func Test_create_table_multiple_columns(t *testing.T) {
 	defer cli.Close()
 	stack := u.Stack[ai.ISnowflakeAsset]{}
 	defer g.DeleteAssets(cli, &stack)
-	db, sch := bootstrapTableAssets(cli, stack)
+	db, sch := bootstrapTableAssets(cli, &stack)
 	tbl := a.Table{
 		DatabaseName: db.Name,
 		SchemaName:   sch.Name,

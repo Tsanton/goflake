@@ -24,7 +24,10 @@ as $$
 import json
 def show_table_description_py(snowpark_session, db_name_py:str, schema_name_py:str, table_name_py:str):
     res = []
-    table = snowpark_session.sql(f"SHOW TABLES like '{table_name_py}' IN SCHEMA {db_name_py}.{schema_name_py}").collect()[0].as_dict()
+    table = snowpark_session.sql(f"SHOW TABLES like '{table_name_py}' IN SCHEMA {db_name_py}.{schema_name_py}").collect()
+    if len(table) <= 0:
+        return {}
+    table = table[0].as_dict()
 
     table['tags'] = []
     tag_query: str = f"SELECT * from table({db_name_py}.INFORMATION_SCHEMA.TAG_REFERENCES('{db_name_py}.{schema_name_py}.{table_name_py}', 'TABLE'));"

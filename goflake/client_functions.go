@@ -3,6 +3,7 @@ package goflake
 import (
 	"context"
 	"encoding/json"
+	"strings"
 
 	ai "github.com/tsanton/goflake-client/goflake/models/assets/interface"
 	d "github.com/tsanton/goflake-client/goflake/models/describables"
@@ -72,7 +73,7 @@ func DescribeOne[T e.ISnowflakeEntity](g *GoflakeClient, obj d.ISnowflakeDescrib
 		}
 	} else {
 		err := g.db.Get(&ret, obj.GetDescribeStatement())
-		if err != nil {
+		if err != nil && !strings.Contains(err.Error(), "no rows in result set") {
 			return ret, err
 		}
 	}

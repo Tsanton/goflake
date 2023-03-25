@@ -24,7 +24,7 @@ func Test_create_table_number_integer(t *testing.T) {
 	defer cli.Close()
 	stack := u.Stack[ai.ISnowflakeAsset]{}
 	defer g.DeleteAssets(cli, &stack)
-	db, sch := bootstrapTableAssets(cli, stack)
+	db, sch := bootstrapTableAssets(cli, &stack)
 	tbl := a.Table{
 		DatabaseName: db.Name,
 		SchemaName:   sch.Name,
@@ -80,7 +80,7 @@ func Test_create_table_number_integer_auto_increment(t *testing.T) {
 	defer cli.Close()
 	stack := u.Stack[ai.ISnowflakeAsset]{}
 	defer g.DeleteAssets(cli, &stack)
-	db, sch := bootstrapTableAssets(cli, stack)
+	db, sch := bootstrapTableAssets(cli, &stack)
 	tbl := a.Table{
 		DatabaseName: db.Name,
 		SchemaName:   sch.Name,
@@ -144,7 +144,7 @@ func Test_create_table_number_decimal(t *testing.T) {
 	defer cli.Close()
 	stack := u.Stack[ai.ISnowflakeAsset]{}
 	defer g.DeleteAssets(cli, &stack)
-	db, sch := bootstrapTableAssets(cli, stack)
+	db, sch := bootstrapTableAssets(cli, &stack)
 	tbl := a.Table{
 		DatabaseName: db.Name,
 		SchemaName:   sch.Name,

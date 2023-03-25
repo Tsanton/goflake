@@ -23,7 +23,7 @@ type Table struct {
 	RetentionTime  c.SnowflakeintConverter `json:"retention_time"`
 	Tags           []ClassificationTag
 	Columns        []Column
-	CreatedOn      c.SnowflakeDatetimeConverter
+	CreatedOn      c.SnowflakeDatetimeConverter `json:"created_on"`
 }
 
 // GetIdentity implements ISnowflakeEntity
