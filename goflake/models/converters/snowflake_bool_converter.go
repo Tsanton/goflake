@@ -3,6 +3,7 @@ package converters
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 )
 
 type SnowflakeBoolConverter bool
@@ -13,10 +14,10 @@ func (bit *SnowflakeBoolConverter) UnmarshalJSON(data []byte) error {
 	if err != nil {
 		return err
 	}
-	switch asString {
-	case "1", "true":
+	switch strings.ToLower(asString) {
+	case "1", "true", "t", "y":
 		*bit = true
-	case "0", "false":
+	case "0", "false", "f", "n":
 		*bit = false
 	default:
 		return fmt.Errorf("boolean unmarshal error: invalid input %s", asString)
