@@ -179,11 +179,12 @@ func (s *Boolean) GetColumnDefinition() string {
 	return sb.String()
 }
 
-/*
-#################
+/*#################
 ### Date column ###
-#################
-*/
+#################*/
+
+var _ ISnowflakeColumn = &Date{}
+
 type Date struct {
 	DefaultValue *string
 	Nullable     bool
@@ -216,6 +217,39 @@ func (s *Date) GetColumnDefinition() string {
 /*#################
 ### Time column ###
 #################*/
+
+var _ ISnowflakeColumn = &Time{}
+
+type Time struct {
+	//0 == seconds, 9 == nanoseconds
+	Scale        int
+	DefaultValue *string
+	Nullable     bool
+	Unique       bool
+	ColumnFields
+}
+
+func (s *Time) GetColumn() *ColumnFields {
+	return &s.ColumnFields
+}
+
+func (s *Time) GetColumnDefinition() string {
+	var sb strings.Builder
+	sb.WriteString(fmt.Sprintf("\t%[1]s TIME(%[2]d)", s.Name, s.Scale))
+	if !s.Nullable {
+		sb.WriteString(" NOT NULL")
+	}
+	if s.Unique {
+		sb.WriteString(" UNIQUE")
+	}
+	if s.DefaultValue != nil {
+		sb.WriteString(fmt.Sprintf(" DEFAULT '%[1]s'", *s.DefaultValue))
+	}
+	if (s.ForeignKey != ForeignKey{}) {
+		panic("foreign keys are not yet implemented")
+	}
+	return sb.String()
+}
 
 /*######################
 ### Timestamp column ###
