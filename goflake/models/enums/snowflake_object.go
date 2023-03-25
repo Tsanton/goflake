@@ -1,5 +1,7 @@
 package enums
 
+import "fmt"
+
 type SnowflakeObject string
 
 func (p SnowflakeObject) String() string {
@@ -11,54 +13,14 @@ func (p SnowflakeObject) ToSingular() string {
 }
 func (p SnowflakeObject) ToPlural() string {
 	switch p {
-	case SnowflakeObjectTable:
-		return "TABLES"
-	case SnowflakeObjectView:
-		return "VIEWS"
-	case SnowflakeObjectMatView:
-		return "MATERIALIZED VIEWS"
-	case SnowflakeObjectAccount:
-		return "ACCOUNTS"
-	case SnowflakeObjectDatabase:
-		return "DATABASES"
-	case SnowflakeObjectDatabaseRole:
-		return "DATABASE_ROLES"
-	case SnowflakeObjectFunction:
-		return "FUNCTIONS"
-	case SnowflakeObjectRole:
-		return "ROLES"
-	case SnowflakeObjectSchema:
-		return "SCHEMAS"
-	case SnowflakeObjectTag:
-		return "TAGS"
-	case SnowflakeObjectUser:
-		return "USERS"
-	case SnowflakeObjectSequence:
-		return "SEQUENCES"
-	case SnowflakeObjectProcedure:
-		return "PROCEDURES"
-	case SnowflakeObjectFileFormat:
-		return "FILE FORMATS"
-	case SnowflakeObjectInternalStage:
-		return "INTERNAL STAGES"
-	case SnowflakeObjectExternalStage:
-		return "EXTERNAL STAGES"
-	case SnowflakeObjectPipe:
-		return "PIPES"
-	case SnowflakeObjectStream:
-		return "STREAMS"
-	case SnowflakeObjectTask:
-		return "TASKS"
 	case SnowflakeObjectMaskingPolicy:
 		return "MASKING POLICIES"
 	case SnowflakeObjectPasswordPolicy:
 		return "PASSWORD POLICIES"
 	case SnowflakeObjectRowAccessPolicy:
 		return "ROW ACCESS POLICIES"
-	case SnowflakeObjectWarehouse:
-		return "WAREHOUSES"
 	default:
-		panic("not implemented")
+		return fmt.Sprintf("%[1]sS", p)
 	}
 }
 

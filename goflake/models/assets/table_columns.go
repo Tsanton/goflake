@@ -3,6 +3,8 @@ package assets
 import (
 	"fmt"
 	"strings"
+
+	enum "github.com/tsanton/goflake-client/goflake/models/enums"
 )
 
 type ForeignKey struct {
@@ -254,6 +256,40 @@ func (s *Time) GetColumnDefinition() string {
 /*######################
 ### Timestamp column ###
 ######################*/
+
+var _ ISnowflakeColumn = &Timestamp{}
+
+type Timestamp struct {
+	TimestampType enum.SnowflakeTimestamp
+	//0 == seconds, 9 == nanoseconds
+	Scale        int
+	DefaultValue *string
+	Nullable     bool
+	Unique       bool
+	ColumnFields
+}
+
+func (s *Timestamp) GetColumn() *ColumnFields {
+	return &s.ColumnFields
+}
+
+func (s *Timestamp) GetColumnDefinition() string {
+	var sb strings.Builder
+	sb.WriteString(fmt.Sprintf("\t%[1]s %[2]s(%[3]d)", s.Name, s.TimestampType, s.Scale))
+	if !s.Nullable {
+		sb.WriteString(" NOT NULL")
+	}
+	if s.Unique {
+		sb.WriteString(" UNIQUE")
+	}
+	if s.DefaultValue != nil {
+		sb.WriteString(fmt.Sprintf(" DEFAULT '%[1]s'", *s.DefaultValue))
+	}
+	if (s.ForeignKey != ForeignKey{}) {
+		panic("foreign keys are not yet implemented")
+	}
+	return sb.String()
+}
 
 /*####################
 ### Variant column ###
