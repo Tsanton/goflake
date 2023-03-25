@@ -17,3 +17,10 @@ func (r *Role) GetDescribeStatement() string {
 func (r *Role) IsProcedure() bool {
 	return false
 }
+
+func (r *Role) GetPrincipalType() string {
+	return "ROLE"
+}
+func (r *Role) GetPrincipalIdentifier() string {
+	return r.Name
+}

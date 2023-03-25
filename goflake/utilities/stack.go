@@ -1,11 +1,11 @@
 package utilities
 
 import (
-	a "github.com/tsanton/goflake-client/goflake/models/assets"
+	ai "github.com/tsanton/goflake-client/goflake/models/assets/interface"
 )
 
 // Stack : a container of objects that are inserted and removed according to the last-in first-out (LIFO) principle
-type Stack[T a.ISnowflakeAsset] struct {
+type Stack[T ai.ISnowflakeAsset] struct {
 	data []T
 }
 

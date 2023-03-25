@@ -1,11 +1,7 @@
 package utilities
 
-import (
-	a "github.com/tsanton/goflake-client/goflake/models/assets"
-)
-
 // Queue : a container of objects (a linear collection) that are inserted and removed according to the first-in first-out (FIFO) principle
-type Queue[T a.ISnowflakeAsset] struct {
+type Queue[T any] struct {
 	data []T
 }
 

@@ -16,6 +16,7 @@ const (
 	PrivilegeReferences                Privilege = "REFERENCES"
 	PrivilegeRebuild                   Privilege = "REBUILD"
 	PrivilegeCreateSchema              Privilege = "CREATE SCHEMA"
+	PrivilegeCreateDatabaseRole        Privilege = "CREATE DATABASE ROLE"
 	PrivilegeImportedPrivileges        Privilege = "IMPORTED PRIVILEGES"
 	PrivilegeModify                    Privilege = "MODIFY"
 	PrivilegeOperate                   Privilege = "OPERATE"
@@ -45,6 +46,10 @@ const (
 	PrivilegeCreateDataExchangeListing Privilege = "CREATE DATA EXCHANGE LISTING"
 	PrivilegeCreateAccount             Privilege = "CREATE ACCOUNT"
 	PrivilegeCreateShare               Privilege = "CREATE SHARE"
+	PrivilegeCreateSecret              Privilege = "CREATE SECRET"
+	PrivilegeCreateSessionPolicy       Privilege = "CREATE SESSION POLICY"
+	PrivilegeCreatePasswordPolicy      Privilege = "CREATE PASSWORD POLICY"
+	PrivilegeCreateAlert               Privilege = "CREATE ALERT"
 	PrivilegeImportShare               Privilege = "IMPORT SHARE"
 	PrivilegeOverrideShareRestrictions Privilege = "OVERRIDE SHARE RESTRICTIONS"
 	PrivilegeAddSearchOptimization     Privilege = "ADD SEARCH OPTIMIZATION"
@@ -85,13 +90,4 @@ func (ps PrivilegeSet) ToList() []string {
 		privs = append(privs, string(p))
 	}
 	return privs
-}
-
-func (ps PrivilegeSet) addString(s string) {
-	ps[Privilege(s)] = struct{}{}
-}
-
-func (ps PrivilegeSet) hasString(s string) bool {
-	_, ok := ps[Privilege(s)]
-	return ok
 }
