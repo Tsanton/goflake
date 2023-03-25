@@ -17,6 +17,10 @@ type Identity struct {
 	IncrementNumber int
 }
 
+func (i Identity) String() string {
+	return fmt.Sprintf("IDENTITY START %[1]d INCREMENT %[2]d", i.StartNumber, i.IncrementNumber)
+}
+
 type MaskingPolicyAssociation struct {
 	DatabaseName string
 	SchemaName   string
@@ -62,7 +66,7 @@ type Varchar struct {
 	//Constraint: 0 <= x <= 16777216
 	Length       int
 	Collation    string
-	DefaultValue string
+	DefaultValue *string
 	Nullable     bool
 	Unique       bool
 	ColumnFields
@@ -74,18 +78,65 @@ func (s *Varchar) GetColumn() *ColumnFields {
 
 func (s *Varchar) GetColumnDefinition() string {
 	var sb strings.Builder
-	sb.WriteString(fmt.Sprintf("\t%[1]s VARCHAR(%[2]d)", s.ColumnFields.Name, s.Length))
+	sb.WriteString(fmt.Sprintf("\t%[1]s VARCHAR(%[2]d)", s.Name, s.Length))
 	if !s.Nullable {
 		sb.WriteString(" NOT NULL")
 	}
 	if s.Unique {
 		sb.WriteString(" UNIQUE")
 	}
-	if s.DefaultValue != "" {
-		sb.WriteString(fmt.Sprintf(" DEFAULT '%[1]s'", s.DefaultValue))
+	if s.DefaultValue != nil {
+		sb.WriteString(fmt.Sprintf(" DEFAULT '%[1]s'", *s.DefaultValue))
 	}
 	if s.Collation != "" {
-		sb.WriteString(fmt.Sprintf(" COLLATE '%[1]s'", s.DefaultValue))
+		sb.WriteString(fmt.Sprintf(" COLLATE '%[1]s'", *s.DefaultValue))
+	}
+	if (s.ForeignKey != ForeignKey{}) {
+		panic("foreign keys are not yet implemented")
+	}
+	return sb.String()
+}
+
+/*###################
+### Number column ###
+###################*/
+
+var _ ISnowflakeColumn = &Number{}
+
+type Number struct {
+	//Precision refers to `xxx` of xxx.yyy -> max 38
+	Precision int
+	//Scale refers to `yyy` of xxx.yyy -> max 37
+	Scale        int
+	DefaultValue *float64
+	Identity     Identity
+	Sequence     SequenceAssociation
+	Nullable     bool
+	Unique       bool
+	ColumnFields
+}
+
+func (s *Number) GetColumn() *ColumnFields {
+	return &s.ColumnFields
+}
+
+func (s *Number) GetColumnDefinition() string {
+	var sb strings.Builder
+	sb.WriteString(fmt.Sprintf("\t%[1]s NUMBER(%[2]d,%[3]d)", s.Name, s.Precision, s.Scale))
+	if !s.Nullable {
+		sb.WriteString(" NOT NULL")
+	}
+	if s.Unique {
+		sb.WriteString(" UNIQUE")
+	}
+	if s.DefaultValue != nil {
+		sb.WriteString(fmt.Sprintf(" DEFAULT %[1]d", s.DefaultValue))
+	}
+	if (s.Identity != Identity{}) {
+		sb.WriteString(fmt.Sprintf(" IDENTITY(%[1]d, %[2]d)", s.Identity.StartNumber, s.Identity.IncrementNumber))
+	}
+	if (s.Sequence != SequenceAssociation{}) {
+		panic("sequence associations are not yet implemented")
 	}
 	if (s.ForeignKey != ForeignKey{}) {
 		panic("foreign keys are not yet implemented")

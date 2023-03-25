@@ -19,9 +19,9 @@ func bootstrapTableAssets(cli *g.GoflakeClient, stack u.Stack[ai.ISnowflakeAsset
 		Comment:  "integration test goflake",
 		Owner:    &a.Role{Name: "SYSADMIN"},
 	}
-	g.RegisterAsset(cli, &db, &stack)
+	_ = g.RegisterAsset(cli, &db, &stack)
 
-	g.RegisterAsset(cli, &sch, &stack)
+	_ = g.RegisterAsset(cli, &sch, &stack)
 
 	return db, sch
 }

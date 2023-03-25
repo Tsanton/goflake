@@ -16,13 +16,13 @@ type ColumnType struct {
 type Column struct {
 	Name          string
 	ColumnType    ColumnType `json:"data_type"`
-	Default       string
-	Check         string
-	Expression    string
+	Default       *string
+	Check         *string
+	Expression    *string
 	PrimaryKey    c.SnowflakeBoolConverter `json:"primary key"`
 	UniqueKey     c.SnowflakeBoolConverter `json:"unique key"`
-	PolicyName    string
-	AutoIncrement string `json:"auto_increment"`
+	PolicyName    *string
+	AutoIncrement *string `json:"auto_increment"`
 	Tags          []ClassificationTag
 	Comment       string
 }
