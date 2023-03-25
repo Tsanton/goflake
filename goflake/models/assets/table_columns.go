@@ -178,3 +178,49 @@ func (s *Boolean) GetColumnDefinition() string {
 	}
 	return sb.String()
 }
+
+/*
+#################
+### Date column ###
+#################
+*/
+type Date struct {
+	DefaultValue *string
+	Nullable     bool
+	Unique       bool
+	ColumnFields
+}
+
+func (s *Date) GetColumn() *ColumnFields {
+	return &s.ColumnFields
+}
+
+func (s *Date) GetColumnDefinition() string {
+	var sb strings.Builder
+	sb.WriteString(fmt.Sprintf("\t%[1]s DATE", s.Name))
+	if !s.Nullable {
+		sb.WriteString(" NOT NULL")
+	}
+	if s.Unique {
+		sb.WriteString(" UNIQUE")
+	}
+	if s.DefaultValue != nil {
+		sb.WriteString(fmt.Sprintf(" DEFAULT '%[1]s'", *s.DefaultValue))
+	}
+	if (s.ForeignKey != ForeignKey{}) {
+		panic("foreign keys are not yet implemented")
+	}
+	return sb.String()
+}
+
+/*#################
+### Time column ###
+#################*/
+
+/*######################
+### Timestamp column ###
+######################*/
+
+/*####################
+### Variant column ###
+####################*/
