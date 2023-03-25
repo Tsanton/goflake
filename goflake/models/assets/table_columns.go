@@ -143,3 +143,38 @@ func (s *Number) GetColumnDefinition() string {
 	}
 	return sb.String()
 }
+
+/*#################
+### Bool column ###
+#################*/
+
+var _ ISnowflakeColumn = &Boolean{}
+
+type Boolean struct {
+	DefaultValue *bool
+	Nullable     bool
+	Unique       bool
+	ColumnFields
+}
+
+func (s *Boolean) GetColumn() *ColumnFields {
+	return &s.ColumnFields
+}
+
+func (s *Boolean) GetColumnDefinition() string {
+	var sb strings.Builder
+	sb.WriteString(fmt.Sprintf("\t%[1]s BOOLEAN", s.Name))
+	if !s.Nullable {
+		sb.WriteString(" NOT NULL")
+	}
+	if s.Unique {
+		sb.WriteString(" UNIQUE")
+	}
+	if s.DefaultValue != nil {
+		sb.WriteString(fmt.Sprintf(" DEFAULT %[1]t", *s.DefaultValue))
+	}
+	if (s.ForeignKey != ForeignKey{}) {
+		panic("foreign keys are not yet implemented")
+	}
+	return sb.String()
+}

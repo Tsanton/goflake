@@ -13,7 +13,7 @@ import (
 	u "github.com/tsanton/goflake-client/goflake/utilities"
 )
 
-func Test_create_table_varchar(t *testing.T) {
+func Test_create_table_bool(t *testing.T) {
 	/* Arrange */
 	cli := i.Goflake()
 	defer cli.Close()
@@ -27,14 +27,12 @@ func Test_create_table_varchar(t *testing.T) {
 		Columns:      u.Queue[a.ISnowflakeColumn]{},
 		Tags:         []a.ClassificationTag{},
 	}
-	col1 := a.Varchar{
-		Length:       16777216,
-		Collation:    "",
+	col1 := a.Boolean{
 		DefaultValue: nil,
 		Nullable:     false,
 		Unique:       false,
 		ColumnFields: a.ColumnFields{
-			Name:       "VARCHAR_COLUMN",
+			Name:       "BOOL_COLUMN",
 			PrimaryKey: false,
 			ForeignKey: a.ForeignKey{},
 			Tags:       []a.ClassificationTag{},
@@ -55,9 +53,8 @@ func Test_create_table_varchar(t *testing.T) {
 	assert.Equal(t, tbl.SchemaName, dbTable.SchemaName)
 	assert.Equal(t, tbl.TableName, dbTable.Name)
 	assert.Equal(t, 1, len(dbTable.Columns))
-	assert.Equal(t, "TEXT", dbTable.Columns[0].ColumnType.Type)
+	assert.Equal(t, "BOOLEAN", dbTable.Columns[0].ColumnType.Type)
 	assert.False(t, dbTable.Columns[0].ColumnType.Nullable)
-	assert.Equal(t, col1.Length, dbTable.Columns[0].ColumnType.Length)
 	assert.False(t, bool(dbTable.Columns[0].PrimaryKey))
 	assert.False(t, bool(dbTable.Columns[0].UniqueKey))
 	assert.Nil(t, dbTable.Columns[0].Default)
