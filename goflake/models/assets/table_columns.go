@@ -294,3 +294,34 @@ func (s *Timestamp) GetColumnDefinition() string {
 /*####################
 ### Variant column ###
 ####################*/
+
+var _ ISnowflakeColumn = &Variant{}
+
+type Variant struct {
+	DefaultValue *string
+	Nullable     bool
+	Unique       bool
+	ColumnFields
+}
+
+func (s *Variant) GetColumn() *ColumnFields {
+	return &s.ColumnFields
+}
+
+func (s *Variant) GetColumnDefinition() string {
+	var sb strings.Builder
+	sb.WriteString(fmt.Sprintf("\t%[1]s VARIANT", s.Name))
+	if !s.Nullable {
+		sb.WriteString(" NOT NULL")
+	}
+	if s.Unique {
+		sb.WriteString(" UNIQUE")
+	}
+	if s.DefaultValue != nil {
+		sb.WriteString(fmt.Sprintf(" DEFAULT '%[1]s'", *s.DefaultValue))
+	}
+	if (s.ForeignKey != ForeignKey{}) {
+		panic("foreign keys are not yet implemented")
+	}
+	return sb.String()
+}
