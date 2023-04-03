@@ -24,3 +24,15 @@ func (bit *SnowflakeBoolConverter) UnmarshalJSON(data []byte) error {
 	}
 	return nil
 }
+
+func (bit *SnowflakeBoolConverter) Scan(data interface{}) error {
+	var converted bool
+	if data != nil {
+		err := json.Unmarshal([]byte(data.(string)), &converted)
+		if err != nil {
+			return err
+		}
+	}
+	*bit = SnowflakeBoolConverter(converted)
+	return nil
+}

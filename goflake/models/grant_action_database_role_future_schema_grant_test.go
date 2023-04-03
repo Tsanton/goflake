@@ -53,12 +53,12 @@ func Test_grant_database_role_future_schema_privilege(t *testing.T) {
 	i.ErrorFailNow(t, g.RegisterAsset(cli, &databaseRole, &stack))
 	i.ErrorFailNow(t, g.RegisterAsset(cli, &privilege, &stack))
 
-	grants, err := g.DescribeMany[*e.FutureGrant](cli, &d.FutureGrant{Principal: &d.DatabaseRole{Name: databaseRole.Name, DatabaseName: databaseRole.DatabaseName}})
+	grants, err := g.DescribeMany[e.FutureGrant](cli, &d.FutureGrant{Principal: &d.DatabaseRole{Name: databaseRole.Name, DatabaseName: databaseRole.DatabaseName}})
 
 	/* Assert */
 	i.ErrorFailNow(t, err)
 	assert.Len(t, grants, 1)
-	schemaFutureSelect, ok := lo.Find(grants, func(i *e.FutureGrant) bool { return i.Privilege == enums.Privilege(enums.PrivilegeSelect.String()) })
+	schemaFutureSelect, ok := lo.Find(grants, func(i e.FutureGrant) bool { return i.Privilege == enums.Privilege(enums.PrivilegeSelect.String()) })
 	assert.True(t, ok)
 	assert.Equal(t, schemaFutureSelect.GrantedOn, enums.SnowflakeObjectTable)
 	assert.Equal(t, fmt.Sprintf("%[1]s.%[2]s.<%[3]s>", db.Name, schema.Name, enums.SnowflakeObjectTable.ToSingular()), schemaFutureSelect.GrantedIdentifier)
@@ -107,30 +107,30 @@ func Test_grant_database_role_future_schema_privileges(t *testing.T) {
 	i.ErrorFailNow(t, g.RegisterAsset(cli, &privilege1, &stack))
 	i.ErrorFailNow(t, g.RegisterAsset(cli, &privilege2, &stack))
 
-	grants, err := g.DescribeMany[*e.FutureGrant](cli, &d.FutureGrant{Principal: &d.DatabaseRole{Name: databaseRole.Name, DatabaseName: databaseRole.DatabaseName}})
+	grants, err := g.DescribeMany[e.FutureGrant](cli, &d.FutureGrant{Principal: &d.DatabaseRole{Name: databaseRole.Name, DatabaseName: databaseRole.DatabaseName}})
 
 	/* Assert */
 	i.ErrorFailNow(t, err)
 	assert.Len(t, grants, 4)
 
 	tableSchemaScope := fmt.Sprintf("%[1]s.%[2]s.<%[3]s>", db.Name, schema.Name, enums.SnowflakeObjectTable.ToSingular())
-	_, ok := lo.Find(grants, func(i *e.FutureGrant) bool {
+	_, ok := lo.Find(grants, func(i e.FutureGrant) bool {
 		return i.Privilege == enums.PrivilegeSelect && i.GrantedIdentifier == tableSchemaScope
 	})
 	assert.True(t, ok)
 
-	_, ok = lo.Find(grants, func(i *e.FutureGrant) bool {
+	_, ok = lo.Find(grants, func(i e.FutureGrant) bool {
 		return i.Privilege == enums.PrivilegeUpdate && i.GrantedIdentifier == tableSchemaScope
 	})
 	assert.True(t, ok)
 
 	viewSchemaScope := fmt.Sprintf("%[1]s.%[2]s.<%[3]s>", db.Name, schema.Name, enums.SnowflakeObjectView.ToSingular())
-	_, ok = lo.Find(grants, func(i *e.FutureGrant) bool {
+	_, ok = lo.Find(grants, func(i e.FutureGrant) bool {
 		return i.Privilege == enums.PrivilegeSelect && i.GrantedIdentifier == viewSchemaScope
 	})
 	assert.True(t, ok)
 
-	_, ok = lo.Find(grants, func(i *e.FutureGrant) bool {
+	_, ok = lo.Find(grants, func(i e.FutureGrant) bool {
 		return i.Privilege == enums.PrivilegeReferences && i.GrantedIdentifier == viewSchemaScope
 	})
 	assert.True(t, ok)

@@ -44,12 +44,12 @@ func Test_grant_database_role_database_privilege(t *testing.T) {
 	i.ErrorFailNow(t, g.RegisterAsset(cli, &databaseRole, &stack))
 	i.ErrorFailNow(t, g.RegisterAsset(cli, &privilege, &stack))
 
-	grants, err := g.DescribeMany[*e.Grant](cli, &d.Grant{Principal: &d.DatabaseRole{Name: databaseRole.Name, DatabaseName: databaseRole.DatabaseName}})
+	grants, err := g.DescribeMany[e.Grant](cli, &d.Grant{Principal: &d.DatabaseRole{Name: databaseRole.Name, DatabaseName: databaseRole.DatabaseName}})
 
 	/* Assert */
 	i.ErrorFailNow(t, err)
 	assert.Len(t, grants, 2) //Database roles are created with usage on database
-	dbCreateRole, ok := lo.Find(grants, func(i *e.Grant) bool { return i.Privilege == enums.PrivilegeCreateDatabaseRole })
+	dbCreateRole, ok := lo.Find(grants, func(i e.Grant) bool { return i.Privilege == enums.PrivilegeCreateDatabaseRole })
 	assert.True(t, ok)
 	assert.Equal(t, "SYSADMIN", dbCreateRole.GrantedBy)
 	assert.Equal(t, enums.SnowflakeObjectDatabase, dbCreateRole.GrantedOn)
@@ -84,18 +84,18 @@ func Test_grant_database_role_database_privileges(t *testing.T) {
 	i.ErrorFailNow(t, g.RegisterAsset(cli, &databaseRole, &stack))
 	i.ErrorFailNow(t, g.RegisterAsset(cli, &privilege, &stack))
 
-	grants, err := g.DescribeMany[*e.Grant](cli, &d.Grant{Principal: &d.DatabaseRole{Name: databaseRole.Name, DatabaseName: databaseRole.DatabaseName}})
+	grants, err := g.DescribeMany[e.Grant](cli, &d.Grant{Principal: &d.DatabaseRole{Name: databaseRole.Name, DatabaseName: databaseRole.DatabaseName}})
 
 	/* Assert */
 	i.ErrorFailNow(t, err)
 	assert.Len(t, grants, 3) //Database roles are created with usage on database
 
-	dbCreateRole, ok := lo.Find(grants, func(i *e.Grant) bool { return i.Privilege == enums.PrivilegeCreateDatabaseRole })
+	dbCreateRole, ok := lo.Find(grants, func(i e.Grant) bool { return i.Privilege == enums.PrivilegeCreateDatabaseRole })
 	assert.True(t, ok)
 	assert.Equal(t, "SYSADMIN", dbCreateRole.GrantedBy)
 	assert.Equal(t, enums.SnowflakeObjectDatabase, dbCreateRole.GrantedOn)
 
-	dbMonitor, ok := lo.Find(grants, func(i *e.Grant) bool { return i.Privilege == enums.PrivilegeMonitor })
+	dbMonitor, ok := lo.Find(grants, func(i e.Grant) bool { return i.Privilege == enums.PrivilegeMonitor })
 	assert.True(t, ok)
 	assert.Equal(t, "SYSADMIN", dbMonitor.GrantedBy)
 	assert.Equal(t, enums.SnowflakeObjectDatabase, dbMonitor.GrantedOn)
