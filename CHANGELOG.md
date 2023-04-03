@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.4.0](https://github.com/Tsanton/goflake-client/compare/v0.3.1...v0.4.0) (2023-04-03)
+
+
+### ⚠ BREAKING CHANGES
+
+* utilize tf-provider-snowflake auth
+
+### Code Refactoring
+
+* utilize tf-provider-snowflake auth ([c9a8715](https://github.com/Tsanton/goflake-client/commit/c9a87151fbea62428d7af0abca3721dd3505e248))
+
 ## [0.3.1](https://github.com/Tsanton/goflake-client/compare/v0.3.0...v0.3.1) (2023-04-03)
 
 
