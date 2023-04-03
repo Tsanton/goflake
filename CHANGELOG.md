@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.3.0](https://github.com/Tsanton/goflake-client/compare/v0.2.0...v0.3.0) (2023-04-03)
+
+
+### ⚠ BREAKING CHANGES
+
+* lifting principal up into grant_asset
+
+### Code Refactoring
+
+* lifting principal up into grant_asset ([ff5c15a](https://github.com/Tsanton/goflake-client/commit/ff5c15aff1ce592039942178e7ae7958c88e1f84))
+
 ## [0.2.0](https://github.com/Tsanton/goflake-client/compare/v0.1.2...v0.2.0) (2023-03-25)
 
 
