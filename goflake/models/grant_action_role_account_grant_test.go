@@ -29,7 +29,8 @@ func Test_grant_role_account_privilege(t *testing.T) {
 		Owner:   &a.Role{Name: "USERADMIN"},
 	}
 	privilege := a.GrantAction{
-		Target:     &a.GrantActionAccountGrant[*a.Role]{Principal: &role},
+		Principal:  &role,
+		Target:     &a.GrantActionAccountGrant{},
 		Privileges: []enums.Privilege{enums.PrivilegeCreateAccount},
 	}
 
@@ -61,7 +62,8 @@ func Test_grant_role_account_privileges(t *testing.T) {
 		Owner:   &a.Role{Name: "USERADMIN"},
 	}
 	privilege := a.GrantAction{
-		Target:     &a.GrantActionAccountGrant[*a.Role]{Principal: &role},
+		Principal:  &role,
+		Target:     &a.GrantActionAccountGrant{},
 		Privileges: []enums.Privilege{enums.PrivilegeCreateAccount, enums.PrivilegeCreateUser},
 	}
 

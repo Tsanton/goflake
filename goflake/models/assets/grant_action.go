@@ -10,14 +10,15 @@ var (
 )
 
 type GrantAction struct {
+	Principal  i.ISnowflakePrincipal
 	Target     i.ISnowflakeGrantAsset
 	Privileges []enum.Privilege
 }
 
-func (r *GrantAction) GetCreateStatement() (string, int) {
-	return r.Target.GetGrantStatement(r.Privileges)
+func (g *GrantAction) GetCreateStatement() (string, int) {
+	return g.Target.GetGrantStatement(g.Principal, g.Privileges)
 }
 
-func (r *GrantAction) GetDeleteStatement() (string, int) {
-	return r.Target.GetRevokeStatement(r.Privileges)
+func (g *GrantAction) GetDeleteStatement() (string, int) {
+	return g.Target.GetRevokeStatement(g.Principal, g.Privileges)
 }

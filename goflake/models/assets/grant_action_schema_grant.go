@@ -10,42 +10,41 @@ import (
 )
 
 var (
-	_ i.ISnowflakeGrantAsset = &GrantActionSchemaGrant[i.ISnowflakePrincipal]{}
+	_ i.ISnowflakeGrantAsset = &GrantActionSchemaGrant{}
 )
 
-type GrantActionSchemaGrant[T i.ISnowflakePrincipal] struct {
-	Principal    T
+type GrantActionSchemaGrant struct {
 	DatabaseName string
 	SchemaName   string
 }
 
-func (r *GrantActionSchemaGrant[T]) GetGrantStatement(privileges []enum.Privilege) (string, int) {
+func (g *GrantActionSchemaGrant) GetGrantStatement(p i.ISnowflakePrincipal, privileges []enum.Privilege) (string, int) {
 	stringPrivileges := lo.Map(privileges, func(x enum.Privilege, index int) string { return x.String() })
 	privs := strings.Join(stringPrivileges, ", ")
-	switch any(r.Principal).(type) {
+	switch any(p).(type) {
 	case *Role:
-		return fmt.Sprintf("GRANT %[1]s ON SCHEMA %[2]s.%[3]s TO ROLE %[4]s;", privs, r.DatabaseName, r.SchemaName, r.Principal.GetIdentifier()), 1
+		return fmt.Sprintf("GRANT %[1]s ON SCHEMA %[2]s.%[3]s TO ROLE %[4]s;", privs, g.DatabaseName, g.SchemaName, p.GetIdentifier()), 1
 	case *DatabaseRole:
-		return fmt.Sprintf("GRANT %[1]s ON SCHEMA %[2]s.%[3]s TO DATABASE ROLE %[4]s;", privs, r.DatabaseName, r.SchemaName, r.Principal.GetIdentifier()), 1
+		return fmt.Sprintf("GRANT %[1]s ON SCHEMA %[2]s.%[3]s TO DATABASE ROLE %[4]s;", privs, g.DatabaseName, g.SchemaName, p.GetIdentifier()), 1
 	default:
 		panic("GetGrantStatement is not implemented for this interface type")
 	}
 }
 
-func (r *GrantActionSchemaGrant[T]) GetRevokeStatement(privileges []enum.Privilege) (string, int) {
+func (r *GrantActionSchemaGrant) GetRevokeStatement(p i.ISnowflakePrincipal, privileges []enum.Privilege) (string, int) {
 	stringPrivileges := lo.Map(privileges, func(x enum.Privilege, index int) string { return x.String() })
 	privs := strings.Join(stringPrivileges, ", ")
-	switch any(r.Principal).(type) {
+	switch any(p).(type) {
 	case *Role:
-		return fmt.Sprintf("REVOKE %[1]s ON SCHEMA %[2]s.%[3]s FROM ROLE %[4]s CASCADE;", privs, r.DatabaseName, r.SchemaName, r.Principal.GetIdentifier()), 1
+		return fmt.Sprintf("REVOKE %[1]s ON SCHEMA %[2]s.%[3]s FROM ROLE %[4]s CASCADE;", privs, r.DatabaseName, r.SchemaName, p.GetIdentifier()), 1
 	case *DatabaseRole:
-		return fmt.Sprintf("REVOKE %[1]s ON SCHEMA %[2]s.%[3]s FROM DATABASE ROLE %[4]s CASCADE;", privs, r.DatabaseName, r.SchemaName, r.Principal.GetIdentifier()), 1
+		return fmt.Sprintf("REVOKE %[1]s ON SCHEMA %[2]s.%[3]s FROM DATABASE ROLE %[4]s CASCADE;", privs, r.DatabaseName, r.SchemaName, p.GetIdentifier()), 1
 	default:
 		panic("GetGrantStatement is not implemented for this interface type")
 	}
 }
 
-func (*GrantActionSchemaGrant[T]) ValidatePrivileges(privileges []enum.Privilege) bool {
+func (*GrantActionSchemaGrant) ValidatePrivileges(privileges []enum.Privilege) bool {
 	allowedPrivileges := []enum.Privilege{
 		enum.PrivilegeModify,
 		enum.PrivilegeMonitor,

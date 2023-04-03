@@ -42,7 +42,8 @@ func Test_grant_database_role_future_schema_privilege(t *testing.T) {
 		Owner:        &a.Role{Name: "USERADMIN"},
 	}
 	privilege := a.GrantAction{
-		Target:     &a.GrantActionFutureSchemaGrant[*a.DatabaseRole]{Principal: &databaseRole, DatabaseName: db.Name, SchemaName: schema.Name, ObjectType: enums.SnowflakeObjectTable},
+		Principal:  &databaseRole,
+		Target:     &a.GrantActionFutureSchemaGrant{DatabaseName: db.Name, SchemaName: schema.Name, ObjectType: enums.SnowflakeObjectTable},
 		Privileges: []enums.Privilege{enums.PrivilegeSelect},
 	}
 
@@ -88,12 +89,14 @@ func Test_grant_database_role_future_schema_privileges(t *testing.T) {
 		Owner:        &a.Role{Name: "USERADMIN"},
 	}
 	privilege1 := a.GrantAction{
-		Target:     &a.GrantActionFutureSchemaGrant[*a.DatabaseRole]{Principal: &databaseRole, DatabaseName: db.Name, SchemaName: schema.Name, ObjectType: enums.SnowflakeObjectTable},
+		Principal:  &databaseRole,
+		Target:     &a.GrantActionFutureSchemaGrant{DatabaseName: db.Name, SchemaName: schema.Name, ObjectType: enums.SnowflakeObjectTable},
 		Privileges: []enums.Privilege{enums.PrivilegeSelect, enums.PrivilegeUpdate},
 	}
 
 	privilege2 := a.GrantAction{
-		Target:     &a.GrantActionFutureSchemaGrant[*a.DatabaseRole]{Principal: &databaseRole, DatabaseName: db.Name, SchemaName: schema.Name, ObjectType: enums.SnowflakeObjectView},
+		Principal:  &databaseRole,
+		Target:     &a.GrantActionFutureSchemaGrant{DatabaseName: db.Name, SchemaName: schema.Name, ObjectType: enums.SnowflakeObjectView},
 		Privileges: []enums.Privilege{enums.PrivilegeSelect, enums.PrivilegeReferences},
 	}
 
