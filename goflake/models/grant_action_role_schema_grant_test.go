@@ -40,7 +40,8 @@ func Test_grant_role_schema_privilege(t *testing.T) {
 		Owner:   &a.Role{Name: "USERADMIN"},
 	}
 	privilege := a.GrantAction{
-		Target:     &a.GrantActionSchemaGrant[*a.Role]{Principal: &role, DatabaseName: db.Name, SchemaName: schema.Name},
+		Principal:  &role,
+		Target:     &a.GrantActionSchemaGrant{DatabaseName: db.Name, SchemaName: schema.Name},
 		Privileges: []enums.Privilege{enums.PrivilegeUsage},
 	}
 
@@ -85,7 +86,8 @@ func Test_grant_role_schema_privileges(t *testing.T) {
 		Owner:   &a.Role{Name: "USERADMIN"},
 	}
 	privilege := a.GrantAction{
-		Target:     &a.GrantActionSchemaGrant[*a.Role]{Principal: &role, DatabaseName: db.Name, SchemaName: schema.Name},
+		Principal:  &role,
+		Target:     &a.GrantActionSchemaGrant{DatabaseName: db.Name, SchemaName: schema.Name},
 		Privileges: []enums.Privilege{enums.PrivilegeUsage, enums.PrivilegeMonitor},
 	}
 

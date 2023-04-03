@@ -5,7 +5,7 @@ import (
 )
 
 type ISnowflakeGrantAsset interface {
-	GetGrantStatement(privileges []enum.Privilege) (string, int)
-	GetRevokeStatement(privileges []enum.Privilege) (string, int)
+	GetGrantStatement(principal ISnowflakePrincipal, privileges []enum.Privilege) (string, int)
+	GetRevokeStatement(principal ISnowflakePrincipal, privileges []enum.Privilege) (string, int)
 	ValidatePrivileges(privileges []enum.Privilege) bool
 }
