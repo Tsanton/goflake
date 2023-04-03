@@ -15,22 +15,7 @@ type FutureGrant struct {
 func (r *FutureGrant) GetDescribeStatement() string {
 	switch any(r.Principal).(type) {
 	case *Role:
-		return fmt.Sprintf(`
-with show_future_grants_to_role as procedure(role_name varchar)
-	returns variant not null
-	language python
-	runtime_version = '3.8'
-	packages = ('snowflake-snowpark-python')
-	handler = 'show_grants_to_role_py'
-as $$
-def show_grants_to_role_py(snowpark_session, role_name_py:str):
-	res = []
-	for row in snowpark_session.sql(f'SHOW FUTURE GRANTS TO ROLE {role_name_py.upper()}').to_local_iterator():
-		res.append(row.as_dict())
-	return res
-$$
-call show_future_grants_to_role('%[1]s');
-	`, r.Principal.GetPrincipalIdentifier())
+		return fmt.Sprintf("SHOW FUTURE GRANTS TO ROLE %s", r.Principal.GetPrincipalIdentifier())
 	case *DatabaseRole:
 		return fmt.Sprintf(`
 with show_future_grants_to_database_role as procedure(database_name varchar, database_role_name varchar)
@@ -61,6 +46,13 @@ call show_future_grants_to_database_role('%[1]s','%[2]s');
 	}
 }
 
-func (*FutureGrant) IsProcedure() bool {
-	return true
+func (r *FutureGrant) IsProcedure() bool {
+	switch any(r.Principal).(type) {
+	case *Role:
+		return false
+	case *DatabaseRole:
+		return true
+	default:
+		panic("Show future grants is not implementer for this principal type")
+	}
 }

@@ -38,12 +38,12 @@ func Test_grant_role_account_privilege(t *testing.T) {
 	i.ErrorFailNow(t, g.RegisterAsset(cli, &role, &stack))
 	i.ErrorFailNow(t, g.RegisterAsset(cli, &privilege, &stack))
 
-	grants, err := g.DescribeMany[*e.Grant](cli, &d.Grant{Principal: &d.Role{Name: role.Name}})
+	grants, err := g.DescribeMany[e.Grant](cli, &d.Grant{Principal: &d.Role{Name: role.Name}})
 
 	/* Assert */
 	i.ErrorFailNow(t, err)
 	assert.Len(t, grants, 1)
-	createAcc, ok := lo.Find(grants, func(i *e.Grant) bool { return i.Privilege == enums.PrivilegeCreateAccount })
+	createAcc, ok := lo.Find(grants, func(i e.Grant) bool { return i.Privilege == enums.PrivilegeCreateAccount })
 	assert.True(t, ok)
 	assert.Equal(t, "ACCOUNTADMIN", createAcc.GrantedBy)
 	assert.Equal(t, enums.SnowflakeObjectAccount, createAcc.GrantedOn)
@@ -71,18 +71,18 @@ func Test_grant_role_account_privileges(t *testing.T) {
 	i.ErrorFailNow(t, g.RegisterAsset(cli, &role, &stack))
 	i.ErrorFailNow(t, g.RegisterAsset(cli, &privilege, &stack))
 
-	grants, err := g.DescribeMany[*e.Grant](cli, &d.Grant{Principal: &d.Role{Name: role.Name}})
+	grants, err := g.DescribeMany[e.Grant](cli, &d.Grant{Principal: &d.Role{Name: role.Name}})
 
 	/* Assert */
 	i.ErrorFailNow(t, err)
 	assert.Len(t, grants, 2)
 
-	createAcc, ok := lo.Find(grants, func(i *e.Grant) bool { return i.Privilege == enums.PrivilegeCreateAccount })
+	createAcc, ok := lo.Find(grants, func(i e.Grant) bool { return i.Privilege == enums.PrivilegeCreateAccount })
 	assert.True(t, ok)
 	assert.Equal(t, "ACCOUNTADMIN", createAcc.GrantedBy)
 	assert.Equal(t, enums.SnowflakeObjectAccount, createAcc.GrantedOn)
 
-	createUser, ok := lo.Find(grants, func(i *e.Grant) bool { return i.Privilege == enums.PrivilegeCreateUser })
+	createUser, ok := lo.Find(grants, func(i e.Grant) bool { return i.Privilege == enums.PrivilegeCreateUser })
 	assert.True(t, ok)
 	assert.Equal(t, "USERADMIN", createUser.GrantedBy)
 	assert.Equal(t, enums.SnowflakeObjectAccount, createUser.GrantedOn)

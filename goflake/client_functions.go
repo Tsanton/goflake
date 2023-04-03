@@ -94,12 +94,20 @@ func DescribeMany[T e.ISnowflakeEntity](g *GoflakeClient, obj d.ISnowflakeDescri
 			return ret, err
 		}
 	} else {
-		err := g.db.Get(&ret, obj.GetDescribeStatement())
+		rows, err := g.db.Queryx(obj.GetDescribeStatement())
 		if err != nil {
 			return ret, err
 		}
+		defer rows.Close()
+		for rows.Next() {
+			var data T
+			err := rows.StructScan(&data)
+			if err != nil {
+				return ret, err
+			}
+			ret = append(ret, data)
+		}
 	}
-
 	return ret, nil
 }
 

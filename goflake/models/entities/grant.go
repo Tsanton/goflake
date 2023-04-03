@@ -6,21 +6,21 @@ import (
 )
 
 var (
-	_ ISnowflakeEntity = &Grant{}
+	_ ISnowflakeEntity = Grant{}
 )
 
 type Grant struct {
-	GranteeIdentifier  string                       `json:"grantee_name"`
-	PrincipalType      string                       `json:"granted_to"`
-	GrantedOn          enum.SnowflakeObject         `json:"granted_on"`
-	GrantedIdentifier  string                       `json:"name"`
-	Privilege          enum.Privilege               `json:"privilege"`
-	GrantOption        c.SnowflakeBoolConverter     `json:"grant_option"`
-	GrantedBy          string                       `json:"granted_by"`
-	Created            c.SnowflakeDatetimeConverter `json:"created_on"`
-	DistanceFromSource int                          `json:"distance_from_source"`
+	GranteeIdentifier  string                       `db:"grantee_name" json:"grantee_name"`
+	PrincipalType      string                       `db:"granted_to" json:"granted_to"`
+	GrantedOn          enum.SnowflakeObject         `db:"granted_on" json:"granted_on"`
+	GrantedIdentifier  string                       `db:"name" json:"name"`
+	Privilege          enum.Privilege               `db:"privilege" json:"privilege"`
+	GrantOption        c.SnowflakeBoolConverter     `db:"grant_option" json:"grant_option"`
+	GrantedBy          string                       `db:"granted_by" json:"granted_by"`
+	Created            c.SnowflakeDatetimeConverter `db:"created_on" json:"created_on"`
+	DistanceFromSource int                          `db:"distance_from_source" json:"distance_from_source"`
 }
 
-func (r *Grant) GetIdentity() string {
+func (r Grant) GetIdentity() string {
 	return "implements ISnowflakeEntity interface"
 }

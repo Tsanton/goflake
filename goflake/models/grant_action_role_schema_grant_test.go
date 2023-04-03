@@ -51,12 +51,12 @@ func Test_grant_role_schema_privilege(t *testing.T) {
 	i.ErrorFailNow(t, g.RegisterAsset(cli, &role, &stack))
 	i.ErrorFailNow(t, g.RegisterAsset(cli, &privilege, &stack))
 
-	grants, err := g.DescribeMany[*e.Grant](cli, &d.Grant{Principal: &d.Role{Name: role.Name}})
+	grants, err := g.DescribeMany[e.Grant](cli, &d.Grant{Principal: &d.Role{Name: role.Name}})
 
 	/* Assert */
 	i.ErrorFailNow(t, err)
 	assert.Len(t, grants, 1)
-	schemaUsage, ok := lo.Find(grants, func(i *e.Grant) bool { return i.Privilege == enums.PrivilegeUsage })
+	schemaUsage, ok := lo.Find(grants, func(i e.Grant) bool { return i.Privilege == enums.PrivilegeUsage })
 	assert.True(t, ok)
 	assert.Equal(t, "SYSADMIN", schemaUsage.GrantedBy)
 	assert.Equal(t, enums.SnowflakeObjectSchema, schemaUsage.GrantedOn)
@@ -97,18 +97,18 @@ func Test_grant_role_schema_privileges(t *testing.T) {
 	i.ErrorFailNow(t, g.RegisterAsset(cli, &role, &stack))
 	i.ErrorFailNow(t, g.RegisterAsset(cli, &privilege, &stack))
 
-	grants, err := g.DescribeMany[*e.Grant](cli, &d.Grant{Principal: &d.Role{Name: role.Name}})
+	grants, err := g.DescribeMany[e.Grant](cli, &d.Grant{Principal: &d.Role{Name: role.Name}})
 
 	/* Assert */
 	i.ErrorFailNow(t, err)
 	assert.Len(t, grants, 2)
 
-	schemaUsage, ok := lo.Find(grants, func(i *e.Grant) bool { return i.Privilege == enums.PrivilegeUsage })
+	schemaUsage, ok := lo.Find(grants, func(i e.Grant) bool { return i.Privilege == enums.PrivilegeUsage })
 	assert.True(t, ok)
 	assert.Equal(t, "SYSADMIN", schemaUsage.GrantedBy)
 	assert.Equal(t, enums.SnowflakeObjectSchema, schemaUsage.GrantedOn)
 
-	schemaMonitor, ok := lo.Find(grants, func(i *e.Grant) bool { return i.Privilege == enums.PrivilegeMonitor })
+	schemaMonitor, ok := lo.Find(grants, func(i e.Grant) bool { return i.Privilege == enums.PrivilegeMonitor })
 	assert.True(t, ok)
 	assert.Equal(t, "SYSADMIN", schemaMonitor.GrantedBy)
 	assert.Equal(t, enums.SnowflakeObjectSchema, schemaMonitor.GrantedOn)
