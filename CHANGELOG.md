@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.5.0](https://github.com/Tsanton/goflake-client/compare/v0.4.0...v0.5.0) (2023-04-27)
+
+
+### ⚠ BREAKING CHANGES
+
+* remove assets dependency on types, opening up for external package implementation of interface
+
+### Code Refactoring
+
+* remove assets dependency on types, opening up for external package implementation of interface ([7dc662d](https://github.com/Tsanton/goflake-client/commit/7dc662d80219ce09167ea824d981a99d9bc21798))
+
 ## [0.4.0](https://github.com/Tsanton/goflake-client/compare/v0.3.1...v0.4.0) (2023-04-03)
 
 
