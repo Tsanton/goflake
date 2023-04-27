@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.6.0](https://github.com/Tsanton/goflake-client/compare/v0.5.0...v0.6.0) (2023-04-27)
+
+
+### ⚠ BREAKING CHANGES
+
+* role inheritance with ISnowflakePrincipal
+
+### Features
+
+* principal direct ascendants ([9bb4ea8](https://github.com/Tsanton/goflake-client/commit/9bb4ea863e61ff23c41b0b7dda45f9a1deceff9b))
+
+
+### Code Refactoring
+
+* role inheritance with ISnowflakePrincipal ([c1b82ba](https://github.com/Tsanton/goflake-client/commit/c1b82ba004cc3278b8a830ff1335395a8c79b811))
+
 ## [0.5.0](https://github.com/Tsanton/goflake-client/compare/v0.4.0...v0.5.0) (2023-04-27)
 
 
