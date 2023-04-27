@@ -1,6 +1,10 @@
 package describables
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/tsanton/goflake-client/goflake/models/enums"
+)
 
 var (
 	_ ISnowflakeDescribable = &PrincipalAscendants{}
@@ -12,15 +16,9 @@ type PrincipalAscendants struct {
 }
 
 func (r *PrincipalAscendants) GetDescribeStatement() string {
-	var principalType string
-	var principalIdentifier string
-	switch any(r.Principal).(type) {
-	case *Role:
-		principalType = r.Principal.GetPrincipalType()
-		principalIdentifier = r.Principal.GetPrincipalIdentifier()
-	case *DatabaseRole:
-		principalType = r.Principal.GetPrincipalType()
-		principalIdentifier = r.Principal.GetPrincipalIdentifier()
+	switch r.Principal.GetPrincipalType() {
+	case enums.SnowflakePrincipalRole, enums.SnowflakePrincipalDatabaseRole:
+		break
 	default:
 		panic("Show grants is not implementer for this principal type")
 	}
@@ -68,7 +66,7 @@ def main_py(snowpark_session, principal_type_py:str, principal_identifier_py:str
     }
 $$
 call show_all_roles_that_inherit_source('%[1]s', '%[2]s')
-`, principalType, principalIdentifier)
+`, r.Principal.GetPrincipalType().GrantType(), r.Principal.GetPrincipalIdentifier())
 }
 
 func (*PrincipalAscendants) IsProcedure() bool {

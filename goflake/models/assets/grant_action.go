@@ -15,10 +15,12 @@ type GrantAction struct {
 	Privileges []enum.Privilege
 }
 
+// GetCreateStatement implements ISnowflakeAsset
 func (g *GrantAction) GetCreateStatement() (string, int) {
 	return g.Target.GetGrantStatement(g.Principal, g.Privileges)
 }
 
+// GetDeleteStatement implements ISnowflakeAsset
 func (g *GrantAction) GetDeleteStatement() (string, int) {
 	return g.Target.GetRevokeStatement(g.Principal, g.Privileges)
 }

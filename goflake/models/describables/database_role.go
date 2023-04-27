@@ -1,9 +1,14 @@
 package describables
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/tsanton/goflake-client/goflake/models/enums"
+)
 
 var (
-	_ ISnowflakeDescribable = &DatabaseRole{}
+	_ ISnowflakeDescribable    = &DatabaseRole{}
+	_ ISnowflakeGrantPrincipal = &DatabaseRole{}
 )
 
 // Beware that you cannot grant account level privleges to database roles
@@ -20,9 +25,12 @@ func (r *DatabaseRole) IsProcedure() bool {
 	return false
 }
 
-func (r *DatabaseRole) GetPrincipalType() string {
-	return "DATABASE ROLE"
+// GetPrincipalType implements ISnowflakeGrantPrincipal
+func (r *DatabaseRole) GetPrincipalType() enums.SnowflakePrincipal {
+	return enums.SnowflakePrincipalDatabaseRole
 }
+
+// GetPrincipalIdentifier implements ISnowflakeGrantPrincipal
 func (r *DatabaseRole) GetPrincipalIdentifier() string {
 	return fmt.Sprintf("%[1]s.%[2]s", r.DatabaseName, r.Name)
 }

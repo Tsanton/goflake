@@ -2,6 +2,9 @@ package describables
 
 import (
 	"fmt"
+	"strings"
+
+	"github.com/tsanton/goflake-client/goflake/models/enums"
 )
 
 var (
@@ -13,10 +16,12 @@ type FutureGrant struct {
 }
 
 func (r *FutureGrant) GetDescribeStatement() string {
-	switch any(r.Principal).(type) {
-	case *Role:
+	switch x := r.Principal.GetPrincipalType(); x {
+	case enums.SnowflakePrincipalRole:
 		return fmt.Sprintf("SHOW FUTURE GRANTS TO ROLE %s", r.Principal.GetPrincipalIdentifier())
-	case *DatabaseRole:
+	case enums.SnowflakePrincipalDatabaseRole:
+		id := r.Principal.GetPrincipalIdentifier()
+		databaseName, roleName := strings.Split(id, ".")[0], strings.Split(id, ".")[1]
 		return fmt.Sprintf(`
 with show_future_grants_to_database_role as procedure(database_name varchar, database_role_name varchar)
 	returns variant not null
@@ -40,17 +45,17 @@ def show_future_grants_to_database_role_py(snowpark_session, database_name_py:st
 	return res
 $$
 call show_future_grants_to_database_role('%[1]s','%[2]s');
-		`, r.Principal.(*DatabaseRole).DatabaseName, r.Principal.(*DatabaseRole).Name)
+		`, databaseName, roleName)
 	default:
 		panic("Show future grants is not implementer for this principal type")
 	}
 }
 
 func (r *FutureGrant) IsProcedure() bool {
-	switch any(r.Principal).(type) {
-	case *Role:
+	switch r.Principal.GetPrincipalType() {
+	case enums.SnowflakePrincipalRole:
 		return false
-	case *DatabaseRole:
+	case enums.SnowflakePrincipalDatabaseRole:
 		return true
 	default:
 		panic("Show future grants is not implementer for this principal type")

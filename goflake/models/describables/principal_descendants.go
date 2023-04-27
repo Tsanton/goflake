@@ -1,6 +1,10 @@
 package describables
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/tsanton/goflake-client/goflake/models/enums"
+)
 
 var (
 	_ ISnowflakeDescribable = &PrincipalDescendants{}
@@ -13,17 +17,11 @@ type PrincipalDescendants struct {
 
 // GetDescribeStatement implements ISnowflakeDescribable
 func (p *PrincipalDescendants) GetDescribeStatement() string {
-	var principalType string
-	var principalIdentifier string
-	switch any(p.Principal).(type) {
-	case *Role:
-		principalType = p.Principal.GetPrincipalType()
-		principalIdentifier = p.Principal.GetPrincipalIdentifier()
-	case *DatabaseRole:
-		principalType = p.Principal.GetPrincipalType()
-		principalIdentifier = p.Principal.GetPrincipalIdentifier()
+	switch p.Principal.GetPrincipalType() {
+	case enums.SnowflakePrincipalRole, enums.SnowflakePrincipalDatabaseRole:
+		break
 	default:
-		panic("GetDescribeStatement is not implementer for this principal type")
+		panic("Show grants is not implementer for this principal type")
 	}
 	return fmt.Sprintf(`
 with show_direct_descendants_from_principal as procedure(principal_type varchar, principal_identifier varchar)
@@ -48,7 +46,7 @@ def show_direct_descendants_from_principal_py(snowpark_session, principal_type_p
     }
 $$
 call show_direct_descendants_from_principal('%[1]s', '%[2]s');
-	`, principalType, principalIdentifier)
+	`, p.Principal.GetPrincipalType().GrantType(), p.Principal.GetPrincipalIdentifier())
 }
 
 // IsProcedure implements ISnowflakeDescribable
