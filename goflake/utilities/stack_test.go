@@ -23,7 +23,7 @@ func Test_stack_put(t *testing.T) {
 	s := u.Stack[i.ISnowflakeAsset]{}
 
 	/* Act */
-	r := a.RoleRelationship{ChildRoleName: "CHILD", ParentRoleName: "PARENT"}
+	r := a.RoleInheritance{ChildPrincipal: &a.Role{Name: "CHILD"}, ParentPrincipal: &a.Role{Name: "PARENT"}}
 	s.Put(&r)
 
 	/* Act and Assert */
@@ -35,9 +35,9 @@ func Test_stack_put(t *testing.T) {
 func Test_stack_order(t *testing.T) {
 	/* Arrange */
 	s := u.Stack[i.ISnowflakeAsset]{}
-	r1 := a.RoleRelationship{ChildRoleName: "A", ParentRoleName: "B"}
-	r2 := a.RoleRelationship{ChildRoleName: "C", ParentRoleName: "D"}
-	r3 := a.RoleRelationship{ChildRoleName: "E", ParentRoleName: "F"}
+	r1 := a.RoleInheritance{ChildPrincipal: &a.Role{Name: "A"}, ParentPrincipal: &a.Role{Name: "B"}}
+	r2 := a.RoleInheritance{ChildPrincipal: &a.Role{Name: "C"}, ParentPrincipal: &a.Role{Name: "D"}}
+	r3 := a.RoleInheritance{ChildPrincipal: &a.Role{Name: "E"}, ParentPrincipal: &a.Role{Name: "F"}}
 	s.Put(&r1)
 	s.Put(&r2)
 	s.Put(&r3)
@@ -47,20 +47,20 @@ func Test_stack_order(t *testing.T) {
 	i2 := s.Get()
 	i3 := s.Get()
 
-	g1, ok1 := i1.(*a.RoleRelationship)
-	g2, ok2 := i2.(*a.RoleRelationship)
-	g3, ok3 := i3.(*a.RoleRelationship)
+	g1, ok1 := i1.(*a.RoleInheritance)
+	g2, ok2 := i2.(*a.RoleInheritance)
+	g3, ok3 := i3.(*a.RoleInheritance)
 
 	/* Assert */
-	if !ok1 || g1.ChildRoleName != r3.ChildRoleName {
+	if !ok1 || g1.ChildPrincipal != r3.ChildPrincipal {
 		t.FailNow()
 	}
 
-	if !ok2 || g2.ChildRoleName != r2.ChildRoleName {
+	if !ok2 || g2.ChildPrincipal != r2.ChildPrincipal {
 		t.FailNow()
 	}
 
-	if !ok3 || g3.ChildRoleName != r1.ChildRoleName {
+	if !ok3 || g3.ChildPrincipal != r1.ChildPrincipal {
 		t.FailNow()
 	}
 

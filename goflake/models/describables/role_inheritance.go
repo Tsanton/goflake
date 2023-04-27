@@ -5,16 +5,16 @@ import (
 )
 
 var (
-	_ ISnowflakeDescribable = &RoleRelationship{}
+	_ ISnowflakeDescribable = &RoleInheritance{}
 )
 
-type RoleRelationship struct {
+type RoleInheritance struct {
 	ChildRoleName  string
 	ParentRoleName string
 }
 
 // GetDescribeStatement implements ISnowflakeDescribable
-func (r *RoleRelationship) GetDescribeStatement() string {
+func (r *RoleInheritance) GetDescribeStatement() string {
 	return fmt.Sprintf(`
 with show_role_inheritance_relationship as procedure(child_role varchar, parent_role varchar)
     returns variant not null
@@ -36,6 +36,6 @@ call show_role_inheritance_relationship('%[1]s', '%[2]s');
 	)
 }
 
-func (*RoleRelationship) IsProcedure() bool {
+func (*RoleInheritance) IsProcedure() bool {
 	return true
 }

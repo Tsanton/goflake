@@ -36,13 +36,13 @@ func Test_role_ascendants(t *testing.T) {
 		Comment: "integration test goflake",
 		Owner:   &a.Role{Name: "USERADMIN"},
 	}
-	rel1 := a.RoleRelationship{
-		ChildRoleName:  rr.Name,
-		ParentRoleName: rrw.Name,
+	rel1 := a.RoleInheritance{
+		ChildPrincipal:  &rr,
+		ParentPrincipal: &rrw,
 	}
-	rel2 := a.RoleRelationship{
-		ChildRoleName:  rrw.Name,
-		ParentRoleName: rrwc.Name,
+	rel2 := a.RoleInheritance{
+		ChildPrincipal:  &rrw,
+		ParentPrincipal: &rrwc,
 	}
 	i.ErrorFailNow(t, g.RegisterAsset(cli, &rr, &stack))
 	i.ErrorFailNow(t, g.RegisterAsset(cli, &rrw, &stack))
@@ -57,11 +57,11 @@ func Test_role_ascendants(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, 2, len(hier.Ascendants))
 
-	qrrw, ok := lo.Find(hier.Ascendants, func(i e.PrincipalAscendant) bool { return i.GranteeIdentifier == rrw.Name })
+	qrrw, ok := lo.Find(hier.Ascendants, func(i e.Grantee) bool { return i.GranteeIdentifier == rrw.Name })
 	assert.True(t, ok)
 	assert.Equal(t, 0, qrrw.DistanceFromSource)
 
-	qrrwc, ok := lo.Find(hier.Ascendants, func(i e.PrincipalAscendant) bool { return i.GranteeIdentifier == rrwc.Name })
+	qrrwc, ok := lo.Find(hier.Ascendants, func(i e.Grantee) bool { return i.GranteeIdentifier == rrwc.Name })
 	assert.True(t, ok)
 	assert.Equal(t, 1, qrrwc.DistanceFromSource)
 }
@@ -75,11 +75,11 @@ func Test_user_admin_ascendants(t *testing.T) {
 	/* Assert */
 	assert.Nil(t, err)
 
-	sa, ok := lo.Find(hier.Ascendants, func(i e.PrincipalAscendant) bool { return i.GranteeIdentifier == "SECURITYADMIN" })
+	sa, ok := lo.Find(hier.Ascendants, func(i e.Grantee) bool { return i.GranteeIdentifier == "SECURITYADMIN" })
 	assert.True(t, ok)
 	assert.Equal(t, 0, sa.DistanceFromSource)
 
-	aa, ok := lo.Find(hier.Ascendants, func(i e.PrincipalAscendant) bool { return i.GranteeIdentifier == "ACCOUNTADMIN" })
+	aa, ok := lo.Find(hier.Ascendants, func(i e.Grantee) bool { return i.GranteeIdentifier == "ACCOUNTADMIN" })
 	assert.True(t, ok)
 	assert.Equal(t, 1, aa.DistanceFromSource)
 }
