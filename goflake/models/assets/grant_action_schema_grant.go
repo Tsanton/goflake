@@ -21,10 +21,10 @@ type GrantActionSchemaGrant struct {
 func (g *GrantActionSchemaGrant) GetGrantStatement(p i.ISnowflakePrincipal, privileges []enum.Privilege) (string, int) {
 	stringPrivileges := lo.Map(privileges, func(x enum.Privilege, index int) string { return x.String() })
 	privs := strings.Join(stringPrivileges, ", ")
-	switch any(p).(type) {
-	case *Role:
+	switch p.GetPrincipalType() {
+	case enum.SnowflakePrincipalRole:
 		return fmt.Sprintf("GRANT %[1]s ON SCHEMA %[2]s.%[3]s TO ROLE %[4]s;", privs, g.DatabaseName, g.SchemaName, p.GetIdentifier()), 1
-	case *DatabaseRole:
+	case enum.SnowflakePrincipalDatabaseRole:
 		return fmt.Sprintf("GRANT %[1]s ON SCHEMA %[2]s.%[3]s TO DATABASE ROLE %[4]s;", privs, g.DatabaseName, g.SchemaName, p.GetIdentifier()), 1
 	default:
 		panic("GetGrantStatement is not implemented for this interface type")
@@ -34,10 +34,10 @@ func (g *GrantActionSchemaGrant) GetGrantStatement(p i.ISnowflakePrincipal, priv
 func (r *GrantActionSchemaGrant) GetRevokeStatement(p i.ISnowflakePrincipal, privileges []enum.Privilege) (string, int) {
 	stringPrivileges := lo.Map(privileges, func(x enum.Privilege, index int) string { return x.String() })
 	privs := strings.Join(stringPrivileges, ", ")
-	switch any(p).(type) {
-	case *Role:
+	switch p.GetPrincipalType() {
+	case enum.SnowflakePrincipalRole:
 		return fmt.Sprintf("REVOKE %[1]s ON SCHEMA %[2]s.%[3]s FROM ROLE %[4]s CASCADE;", privs, r.DatabaseName, r.SchemaName, p.GetIdentifier()), 1
-	case *DatabaseRole:
+	case enum.SnowflakePrincipalDatabaseRole:
 		return fmt.Sprintf("REVOKE %[1]s ON SCHEMA %[2]s.%[3]s FROM DATABASE ROLE %[4]s CASCADE;", privs, r.DatabaseName, r.SchemaName, p.GetIdentifier()), 1
 	default:
 		panic("GetGrantStatement is not implemented for this interface type")

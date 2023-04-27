@@ -20,7 +20,7 @@ type Table struct {
 	Tags         []ClassificationTag
 }
 
-// GetCreateStatement implements inter.ISnowflakeAsset
+// GetCreateStatement implements ISnowflakeAsset
 func (r *Table) GetCreateStatement() (string, int) {
 	statements := 1
 	var sb strings.Builder
@@ -59,7 +59,7 @@ func (r *Table) GetCreateStatement() (string, int) {
 	return sb.String(), statements
 }
 
-// GetDeleteStatement implements inter.ISnowflakeAsset
+// GetDeleteStatement implements ISnowflakeAsset
 func (r *Table) GetDeleteStatement() (string, int) {
 	return fmt.Sprintf("DROP TABLE %[1]s.%[2]s.%[3]s;", r.DatabaseName, r.SchemaName, r.TableName), 1
 }

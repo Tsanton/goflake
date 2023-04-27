@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	i "github.com/tsanton/goflake-client/goflake/models/assets/interface"
+	e "github.com/tsanton/goflake-client/goflake/models/enums"
 )
 
 var (
@@ -20,15 +21,13 @@ type Tag struct {
 	Owner        i.ISnowflakePrincipal
 }
 
-// GetCreateStatement implements inter.ISnowflakeAsset
+// GetCreateStatement implements ISnowflakeAsset
 func (r *Tag) GetCreateStatement() (string, int) {
 	var sb strings.Builder
-	var principalType string
-	switch r.Owner.(type) {
-	case *Role:
-		principalType = "ROLE"
-	case *DatabaseRole:
-		principalType = "DATABASE ROLE"
+	var principal e.SnowflakePrincipal
+	switch x := r.Owner.GetPrincipalType(); x {
+	case e.SnowflakePrincipalRole, e.SnowflakePrincipalDatabaseRole:
+		principal = x
 	default:
 		panic("Ownership for this principal type is not implemented")
 	}
@@ -45,11 +44,11 @@ func (r *Tag) GetCreateStatement() (string, int) {
 
 	sb.WriteString(fmt.Sprintf(" COMMENT = '%[1]s';\n", r.Comment))
 
-	sb.WriteString(fmt.Sprintf("GRANT OWNERSHIP ON TAG %[1]s.%[2]s.%[3]s TO %[4]s %[5]s;", r.DatabaseName, r.SchemaName, r.TagName, principalType, r.Owner.GetIdentifier()))
+	sb.WriteString(fmt.Sprintf("GRANT OWNERSHIP ON TAG %[1]s.%[2]s.%[3]s TO %[4]s %[5]s;", r.DatabaseName, r.SchemaName, r.TagName, principal.GrantType(), r.Owner.GetIdentifier()))
 	return sb.String(), 2
 }
 
-// GetDeleteStatement implements inter.ISnowflakeAsset
+// GetDeleteStatement implements ISnowflakeAsset
 func (r *Tag) GetDeleteStatement() (string, int) {
 	return fmt.Sprintf("DROP TAG %[1]s.%[2]s.%[3]s;", r.DatabaseName, r.SchemaName, r.TagName), 1
 }
