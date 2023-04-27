@@ -1,6 +1,10 @@
 package describables
 
+import (
+	e "github.com/tsanton/goflake-client/goflake/models/enums"
+)
+
 type ISnowflakeGrantPrincipal interface {
-	GetPrincipalType() string
 	GetPrincipalIdentifier() string
+	GetPrincipalType() e.SnowflakePrincipal
 }

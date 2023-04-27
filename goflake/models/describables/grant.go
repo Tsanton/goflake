@@ -2,6 +2,8 @@ package describables
 
 import (
 	"fmt"
+
+	"github.com/tsanton/goflake-client/goflake/models/enums"
 )
 
 var (
@@ -13,19 +15,13 @@ type Grant struct {
 }
 
 func (r *Grant) GetDescribeStatement() string {
-	var principalType string
-	var principalIdentifier string
-	switch any(r.Principal).(type) {
-	case *Role:
-		principalType = r.Principal.GetPrincipalType()
-		principalIdentifier = r.Principal.GetPrincipalIdentifier()
-	case *DatabaseRole:
-		principalType = r.Principal.GetPrincipalType()
-		principalIdentifier = r.Principal.GetPrincipalIdentifier()
+	switch r.Principal.GetPrincipalType() {
+	case enums.SnowflakePrincipalRole, enums.SnowflakePrincipalDatabaseRole:
+		break
 	default:
 		panic("Show grants is not implementer for this principal type")
 	}
-	return fmt.Sprintf("SHOW GRANTS TO %s %s", principalType, principalIdentifier)
+	return fmt.Sprintf("SHOW GRANTS TO %s %s", r.Principal.GetPrincipalType().GrantType(), r.Principal.GetPrincipalIdentifier())
 }
 
 func (*Grant) IsProcedure() bool {

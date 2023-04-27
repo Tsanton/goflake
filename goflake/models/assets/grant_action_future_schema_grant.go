@@ -23,10 +23,10 @@ func (g *GrantActionFutureSchemaGrant) GetGrantStatement(p i.ISnowflakePrincipal
 	stringPrivileges := lo.Map(privileges, func(x enum.Privilege, index int) string { return x.String() })
 	privs := strings.Join(stringPrivileges, ", ")
 
-	switch any(p).(type) {
-	case *Role:
+	switch p.GetPrincipalType() {
+	case enum.SnowflakePrincipalRole:
 		return fmt.Sprintf("GRANT %[1]s ON FUTURE %[2]s IN SCHEMA %[3]s.%[4]s TO ROLE %[5]s;", privs, g.ObjectType.ToPlural(), g.DatabaseName, g.SchemaName, p.GetIdentifier()), 1
-	case *DatabaseRole:
+	case enum.SnowflakePrincipalDatabaseRole:
 		return fmt.Sprintf("GRANT %[1]s ON FUTURE %[2]s IN SCHEMA %[3]s.%[4]s TO DATABASE ROLE %[5]s;", privs, g.ObjectType.ToPlural(), g.DatabaseName, g.SchemaName, p.GetIdentifier()), 1
 	default:
 		panic("GetGrantStatement is not implemented for this interface type")
@@ -37,10 +37,10 @@ func (g *GrantActionFutureSchemaGrant) GetRevokeStatement(p i.ISnowflakePrincipa
 	stringPrivileges := lo.Map(privileges, func(x enum.Privilege, index int) string { return x.String() })
 	privs := strings.Join(stringPrivileges, ", ")
 
-	switch any(p).(type) {
-	case *Role:
+	switch p.GetPrincipalType() {
+	case enum.SnowflakePrincipalRole:
 		return fmt.Sprintf("REVOKE %[1]s ON FUTURE %[2]s IN SCHEMA %[3]s.%[4]s FROM ROLE %[5]s CASCADE;", privs, g.ObjectType.ToPlural(), g.DatabaseName, g.SchemaName, p.GetIdentifier()), 1
-	case *DatabaseRole:
+	case enum.SnowflakePrincipalDatabaseRole:
 		return fmt.Sprintf("REVOKE %[1]s ON FUTURE %[2]s IN SCHEMA %[3]s.%[4]s FROM DATABASE ROLE %[5]s CASCADE;", privs, g.ObjectType.ToPlural(), g.DatabaseName, g.SchemaName, p.GetIdentifier()), 1
 	default:
 		panic("GetGrantStatement is not implemented for this interface type")

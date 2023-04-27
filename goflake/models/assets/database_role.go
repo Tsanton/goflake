@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	i "github.com/tsanton/goflake-client/goflake/models/assets/interface"
+	e "github.com/tsanton/goflake-client/goflake/models/enums"
 )
 
 var (
@@ -18,11 +19,7 @@ type DatabaseRole struct {
 	Comment      string
 }
 
-// GetIdentifier implements ISnowflakeRole
-func (r *DatabaseRole) GetIdentifier() string {
-	return fmt.Sprintf("%[1]s.%[2]s", r.DatabaseName, r.Name)
-}
-
+// GetCreateStatement implements ISnowflakeAsset
 func (r *DatabaseRole) GetCreateStatement() (string, int) {
 	return fmt.Sprintf(`
 	CREATE OR REPLACE DATABASE ROLE %[1]s COMMENT = '%[2]s';
@@ -31,6 +28,17 @@ func (r *DatabaseRole) GetCreateStatement() (string, int) {
 	), 2
 }
 
+// GetDeleteStatement implements ISnowflakeAsset
 func (r *DatabaseRole) GetDeleteStatement() (string, int) {
 	return fmt.Sprintf("DROP DATABASE ROLE %[1]s;", r.GetIdentifier()), 1
+}
+
+// GetIdentifier implements ISnowflakePrincipal
+func (r *DatabaseRole) GetIdentifier() string {
+	return fmt.Sprintf("%[1]s.%[2]s", r.DatabaseName, r.Name)
+}
+
+// GetPrincipalType implements ISnowflakePrincipal
+func (r *DatabaseRole) GetPrincipalType() e.SnowflakePrincipal {
+	return e.SnowflakePrincipalDatabaseRole
 }
