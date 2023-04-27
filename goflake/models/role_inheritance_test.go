@@ -29,9 +29,9 @@ func Test_create_role_relationship(t *testing.T) {
 		Comment: "integration test goflake",
 		Owner:   &a.Role{Name: "USERADMIN"},
 	}
-	rel := a.RoleRelationship{
-		ChildRoleName:  rc.Name,
-		ParentRoleName: rp.Name,
+	rel := a.RoleInheritance{
+		ChildPrincipal:  &rc,
+		ParentPrincipal: &rp,
 	}
 	i.ErrorFailNow(t, g.RegisterAsset(cli, &rc, &stack))
 	i.ErrorFailNow(t, g.RegisterAsset(cli, &rp, &stack))
@@ -68,16 +68,16 @@ func Test_describe_role_relationship(t *testing.T) {
 		Comment: "integration test goflake",
 		Owner:   &a.Role{Name: "USERADMIN"},
 	}
-	rel := a.RoleRelationship{
-		ChildRoleName:  rc.Name,
-		ParentRoleName: rp.Name,
+	rel := a.RoleInheritance{
+		ChildPrincipal:  &rc,
+		ParentPrincipal: &rp,
 	}
 	i.ErrorFailNow(t, g.RegisterAsset(cli, &rc, &stack))
 	i.ErrorFailNow(t, g.RegisterAsset(cli, &rp, &stack))
 
 	/* Act */
 	i.ErrorFailNow(t, g.RegisterAsset(cli, &rel, &stack))
-	dr, err := g.DescribeOne[e.RoleRelationship](cli, &d.RoleRelationship{ChildRoleName: rc.Name, ParentRoleName: rp.Name})
+	dr, err := g.DescribeOne[e.RoleInheritance](cli, &d.RoleInheritance{ChildRoleName: rc.Name, ParentRoleName: rp.Name})
 	i.ErrorFailNow(t, err)
 
 	/* Assert */

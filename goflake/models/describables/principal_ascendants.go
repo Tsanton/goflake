@@ -35,11 +35,10 @@ def show_grants_on_py(snowpark_session, principal_type_py:str, principal_identif
     res = []
     try:
         for row in snowpark_session.sql(f'SHOW GRANTS OF {principal_type_py} {principal_identifier_py}').to_local_iterator():
-            if row['granted_to'] in ['ROLE', 'DATABASE_ROLE']:
-                res.append({
-                    **row.as_dict(),
-                    **{ 'distance_from_source': links_removed, 'granted_on' : principal_type_py if principal_type_py != 'DATABASE ROLE' else 'DATABASE_ROLE' }
-                })
+            res.append({
+                **row.as_dict(),
+                **{ 'distance_from_source': links_removed, 'granted_on' : principal_type_py if principal_type_py != 'DATABASE ROLE' else 'DATABASE_ROLE' }
+            })
     except:
         return res
     return res
